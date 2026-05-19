@@ -34,7 +34,6 @@ struct MediaView: View {
                 Text("13 Episodes").font(.title)
                 ForEach(episodes) {
                     episode in
-
                     HStack {
                         Image(systemName: "ASSASA")
                             .frame(height: 100.0)

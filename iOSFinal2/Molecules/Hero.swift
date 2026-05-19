@@ -11,6 +11,7 @@ struct Hero: View {
     var title: String
     var subtitle: String?
     var description: String?
+    var backgroundImage: Image?
 
     var body: some View {
         VStack(alignment: .leading) {

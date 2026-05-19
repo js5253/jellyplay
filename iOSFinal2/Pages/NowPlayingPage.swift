@@ -31,11 +31,11 @@ struct NowPlayingPage {
         .task {
             // Use the task modifier to defer creating the player to ensure
             // SwiftUI creates it only once when it first presents the view.
-            let url = URL(filePath: "ASSASA")  // URL to local or remote media.
+            let url = URL(filePath: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")  // URL to local or remote media.
             player = AVPlayer(url: url)
         }
     }
 }
 #Preview {
-    NowPlayingPage()
+//    NowPlayingPage()
 }

@@ -5,11 +5,26 @@
 //  Created by jose on 5/19/26.
 //
 import SwiftUI
+
 struct SearchPage: View {
     @State() var searchText: String = ""
+    @State private var selectedFlavor: Flavor = .chocolate
     var body: some View {
         VStack {
-            TextField("Search", text: $searchText)
+            HStack {
+                TextField("Search", text: $searchText)
+                Picker("Flavor", selection: $selectedFlavor) {
+                    Text("All Libraries").tag(Flavor.chocolate)
+                    Text("Movies").tag(Flavor.vanilla)
+                    Text("TV").tag(Flavor.strawberry)
+                }
+            }
+
+            if searchText == "" {
+                Text("Start typing above to find items").foregroundStyle(.gray)
+            } else {
+
+            }
             Grid {
                 GridRow {
                     Text("Hello")
@@ -44,12 +59,12 @@ struct SearchPage: View {
                     Text("World")
                 }
             }
-            
+
         }
         .padding()
         .textFieldStyle(.roundedBorder)
     }
-        
+
 }
 #Preview {
     SearchPage()

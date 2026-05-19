@@ -16,22 +16,23 @@ struct LoginPage: View {
             Text("Sign in to your Jellyfin server").font(.title)
             Text("Server Address")
             HStack {
-                TextField(text: $serverAddress, label: {Text("ASS")})
+                TextField(text: $serverAddress, label: {Text(verbatim: "https://example.com")})
                 Button(action: {
                     isCurrentlyCheckingServer = true
                 }) {
                     Image(systemName:  "star.fill").foregroundStyle(isCurrentlyCheckingServer ? .red : .black)
                 }
             }
-            Text("Server Address")
-            TextField(text: $serverAddress, label: {Text("ASS")})
-            Text("Server Address")
-            TextField(text: $serverAddress, label: {Text("ASS")})
+            Text("Username")
+            TextField(text: $serverAddress, label: {Text("")})
+            Text("Password")
+            TextField(text: $serverAddress, label: {Text("")})
             
             Button(action: {
             }) {
                 Label("Sign In", systemImage: "arrow.up")
-            }.disabled(isCurrentlyCheckingServer)
+            }.background(.blue).clipShape(.buttonBorder).frame(maxWidth: .infinity).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)
+                .padding()
         }
             .textFieldStyle(.roundedBorder)
             .padding()
