@@ -12,7 +12,7 @@ struct ItemSection: View {
     var body: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: true) {
-                Text("Continue Watching").font(.title2)
+                Text(heading).font(.title2)
                 List {
                     ForEach(items) {
                         item in
