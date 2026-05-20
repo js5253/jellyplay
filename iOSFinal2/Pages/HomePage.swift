@@ -6,16 +6,10 @@
 //
 import SwiftUI
 
-struct MediaItem: Identifiable, Hashable {
-    let name: String
-    var id: String { name }
-}
 enum Tabs: Equatable, Hashable, Identifiable {
     var id: Self { return self }
 
-    case watchNow
-    case search
-    case settings
+    case watchNow, search, settings, watchlist
 }
 
 struct HomePage: View {
@@ -24,7 +18,13 @@ struct HomePage: View {
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
         VStack(alignment: .leading) {
-            Hero(title: "ASSASA")
+            MultiItemHero(items: [
+                MediaItem(name: "The Bee Movie"),
+                MediaItem(name: "The LEGO Movie"),
+                MediaItem(name: "The Emoji Movie"),
+                MediaItem(name: "CATS: The Movie"),
+                MediaItem(name: "Love on a Leash"),
+            ])
             ScrollView {
                 ItemSection(heading: "Continue Watching", items: media)
                 ItemSection(heading: "Next Up", items: media)
@@ -32,7 +32,11 @@ struct HomePage: View {
                     Text("Looking for something new?").font(.title2)
                     HStack {
                         ScrollView {
-                            Button("Random Watchlist", action: {})
+                            Button(action: {}) {
+                                    Label("Random Watchlist Item", systemImage: "die.face.5")
+                                }
+                            .buttonStyle(.glassProminent)
+
                             Text("or...")
                             Button("{ITEM 1}", action: {})
                             Button("{ITEM 1}", action: {})
@@ -40,13 +44,9 @@ struct HomePage: View {
                             Button("{ITEM 1}", action: {})
                         }
                     }
-                }.frame(maxWidth: .infinity)
-                    .frame(height: 200.0)
-                    .background(
-                        Gradient(colors: [.white, .teal, .white]).opacity(
-                            0.6
-                        )
-                    )
+                }
+                .padding()
+                .glassEffect(in: .rect(cornerRadius: 16.0))
 
                 ItemSection(heading: "Latest in Movies", items: media)
                 ItemSection(heading: "Latest in TV Shows", items: media)

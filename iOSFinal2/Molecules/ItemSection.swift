@@ -10,10 +10,11 @@ struct ItemSection: View {
     var heading: String
     var items: [MediaItem]
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Text(heading).font(.title2)
             ScrollView(.horizontal, showsIndicators: true) {
-                Text(heading).font(.title2)
-                List {
+                HStack {
+
                     ForEach(items) {
                         item in
                         NavigationLink(value: item) {
@@ -43,6 +44,6 @@ struct ItemSection: View {
 #Preview(traits: .sizeThatFitsLayout) {
     ItemSection(
         heading: "AAAA",
-        items: [MediaItem(name: "Happy Feet 2")]
+        items: [MediaItem(name: "Happy Feet 2"), MediaItem(name: "Happy Feet 3"), MediaItem(name: "Happy Feet 4"), MediaItem(name: "Happy Feet 5")]
     )
 }

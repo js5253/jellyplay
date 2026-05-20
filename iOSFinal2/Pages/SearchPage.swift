@@ -10,7 +10,7 @@ struct SearchPage: View {
     @State() var searchText: String = ""
     @State private var selectedFlavor: Flavor = .chocolate
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             HStack {
                 TextField("Search", text: $searchText)
                 Picker("Flavor", selection: $selectedFlavor) {
@@ -19,50 +19,57 @@ struct SearchPage: View {
                     Text("TV").tag(Flavor.strawberry)
                 }
             }
-
             if searchText == "" {
-                Text("Start typing above to find items").foregroundStyle(.gray)
-            } else {
+                Text("Recent Searches").font(.title)
+                Label("'Icon'", systemImage: "magnifyingglass")
+                Divider()
+                Text("House M.D. (2006)")
+                Text("TV - Watchlisted").font(.caption)
 
-            }
-            Grid {
-                GridRow {
-                    Text("Hello")
-                    Image(systemName: "globe")
+            } else {
+                Grid {
+                    GridRow {
+                        Text("Hello")
+                        Image(systemName: "globe")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
+                    GridRow {
+                        Image(systemName: "hand.wave")
+                        Text("World")
+                    }
                 }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
-                GridRow {
-                    Image(systemName: "hand.wave")
-                    Text("World")
-                }
+
             }
 
         }
+        
         .padding()
         .textFieldStyle(.roundedBorder)
+        .frame(maxHeight: .infinity)
+
     }
 
 }

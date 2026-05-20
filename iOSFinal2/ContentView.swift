@@ -8,9 +8,8 @@
 import SwiftUI
 
 enum RootNavigationDestination {
-    case loading
-    case loginPage
-    case homePage
+    case loading, loginPage, homePage
+    
 }
 struct RootLoggedInView: View {
     @State private var selectedTab: Tabs = .watchNow
@@ -21,8 +20,11 @@ struct RootLoggedInView: View {
                 Tab("Home", systemImage: "play", value: .watchNow) {
                     HomePage()
                 }
-                Tab("Home", systemImage: "gear", value: .search) {
+                Tab("Search", systemImage: "gear", value: .search) {
                     SearchPage()
+                }
+                Tab("Watchlist", systemImage: "gear", value: .watchlist) {
+                    WatchlistPage()
                 }
                 Tab("Settings", systemImage: "gear", value: .settings) {
                     SettingsPage()
