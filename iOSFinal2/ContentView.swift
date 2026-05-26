@@ -55,5 +55,5 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView(currentView: .homePage)
+    ContentView(currentView: .loginPage)
 }

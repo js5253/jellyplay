@@ -18,17 +18,32 @@ struct LoginPage: View {
             HStack {
                 TextField(text: $serverAddress, label: {Text(verbatim: "https://example.com")})
                 Button(action: {
-                    isCurrentlyCheckingServer = true
+                    Task {
+                        isCurrentlyCheckingServer = true
+                        
+                        do {
+                            try await JellyfinService.shared.getServerConfig(serverBase: serverAddress)
+                        }
+                        catch {
+                            
+                        }
+
+                    }
                 }) {
                     Image(systemName:  "star.fill").foregroundStyle(isCurrentlyCheckingServer ? .red : .black)
                 }
             }
             Text("Username")
-            TextField(text: $serverAddress, label: {Text("")})
+            TextField(text: $serverUsername, label: {Text("")})
             Text("Password")
-            TextField(text: $serverAddress, label: {Text("")})
+            TextField(text: $serverPassword, label: {Text("")})
             
             Button(action: {
+                Task {
+                    isCurrentlyCheckingServer = true
+                    try await JellyfinService.shared.logIn(serverAddress: serverAddress, username: serverUsername, password: serverPassword)
+                    isCurrentlyCheckingServer = false
+                }
             }) {
                 Label("Sign In", systemImage: "arrow.up")
             }.background(.blue).clipShape(.buttonBorder).frame(maxWidth: .infinity).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)

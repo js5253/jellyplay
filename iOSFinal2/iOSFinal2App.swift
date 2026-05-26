@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct iOSFinal2App: App {
+    var currentView = JellyfinService.shared.isLoggedIn() ? RootNavigationDestination.homePage : RootNavigationDestination.loginPage
     var body: some Scene {
         WindowGroup {
-            ContentView(currentView: .homePage)
+            ContentView(currentView: currentView)
         }
     }
 }
