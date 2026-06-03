@@ -59,7 +59,10 @@ final class JellyfinService: ObservableObject {
         
     }
     private func getAuthHeader() -> String {
-        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"(deviceId)\" Token=\"(item)\", Version=\"10.11.10\""
+        if (!isLoggedIn) {
+            return ""
+        }
+        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + " Token=\"" + accessToken! + "\", Version=\"0.0.1\""
 
     }
     func getLibraries() async throws -> [Library] {
@@ -142,13 +145,19 @@ final class JellyfinService: ObservableObject {
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
-
+            
             
             let body = ["Username": username, "Pw": password]
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+            request.setValue("MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + (deviceId) + "\", Version=\"10.11.10\"", forHTTPHeaderField: "Authorization")
             
-            let (data, _) = try await URLSession.shared.data(for: request)
-            if let textContent = String(data: data, encoding: .utf8) { // for debugging use  
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return
+            }
+            print(httpResponse.statusCode)
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
                         print(textContent)
                     }
 

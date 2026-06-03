@@ -5,6 +5,7 @@
 //  Created by jose on 5/19/26.
 //
 import SwiftUI
+
 struct LoginPage: View {
     @State var serverAddress: String = ""
     @State var serverUsername: String = ""
@@ -12,45 +13,61 @@ struct LoginPage: View {
     @State var isCurrentlyCheckingServer: Bool = false
 
     var body: some View {
-        VStack() {
+        VStack {
             Text("Sign in to your Jellyfin server").font(.title)
             Text("Server Address")
             HStack {
-                TextField(text: $serverAddress, label: {Text(verbatim: "https://example.com")})
+                TextField(
+                    text: $serverAddress,
+                    label: { Text(verbatim: "https://example.com") }
+                )
+                .keyboardType(.URL)
                 Button(action: {
                     Task {
                         isCurrentlyCheckingServer = true
-                        
+
                         do {
-                            try await JellyfinService.shared.getServerConfig(serverBase: serverAddress)
-                        }
-                        catch {
-                            
+                            try await JellyfinService.shared.getServerConfig(
+                                serverBase: serverAddress
+                            )
+                        } catch {
+
                         }
 
                     }
                 }) {
-                    Image(systemName:  "star.fill").foregroundStyle(isCurrentlyCheckingServer ? .red : .black)
+                    Image(systemName: "star.fill").foregroundStyle(
+                        isCurrentlyCheckingServer ? .red : .black
+                    )
                 }
             }
             Text("Username")
-            TextField(text: $serverUsername, label: {Text("")})
+            TextField(text: $serverUsername, label: { Text("") })
+
             Text("Password")
-            TextField(text: $serverPassword, label: {Text("")})
-            
+            SecureField(text: $serverPassword, label: { Text("") })
+
             Button(action: {
                 Task {
                     isCurrentlyCheckingServer = true
-                    try await JellyfinService.shared.logIn(serverAddress: serverAddress, username: serverUsername, password: serverPassword)
+                    try await JellyfinService.shared.logIn(
+                        serverAddress: serverAddress,
+                        username: serverUsername,
+                        password: serverPassword
+                    )
                     isCurrentlyCheckingServer = false
                 }
             }) {
                 Label("Sign In", systemImage: "arrow.up")
-            }.background(.blue).clipShape(.buttonBorder).frame(maxWidth: .infinity).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)
+            }.background(.blue).clipShape(.buttonBorder).frame(
+                maxWidth: .infinity
+            ).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)
                 .padding()
         }
-            .textFieldStyle(.roundedBorder)
-            .padding()
+        .autocorrectionDisabled()
+        .textInputAutocapitalization(.never)
+        .textFieldStyle(.roundedBorder)
+        .padding()
 
     }
 }
