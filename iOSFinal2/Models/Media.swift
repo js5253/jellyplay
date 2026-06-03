@@ -21,7 +21,7 @@ protocol Mediable {
 
 }
 
-struct MediaItem: Identifiable, Hashable {
+struct MediaItem: Identifiable, Hashable, Codable {
     let name: String
 //    let itemDescription: String?
     var id: String { name }
@@ -48,7 +48,14 @@ extension MediaItem: Mediable {
         return nil
     }
     var itemType: MediaType {
-        return .Show
+        return .Movie
     }
     
+}
+
+struct ContinueWatchingResponse: Codable {
+    enum CodingKeys: String, CodingKey {
+        case items = "Items"
+    }
+    var items: [MediaItem]
 }

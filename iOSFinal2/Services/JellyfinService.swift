@@ -16,7 +16,7 @@ final class JellyfinService: ObservableObject {
     static var shared = JellyfinService()
     
     private let serverAddress: String?
-    private let userId: String?
+    private var userId: String?
     private var accessToken: String?
     private let deviceId: String?
     
@@ -62,12 +62,13 @@ final class JellyfinService: ObservableObject {
         if (!isLoggedIn) {
             throw AppErrors.notAuthenticatedError
         }
-        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + "\" Token=\"" + accessToken! + "\", Version=\"0.0.1\""
+        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + "\", Token=\"" + accessToken! + "\", Version=\"0.0.1\""
 
     }
     private func prepareAuthedRequest(apiSuffix: String, httpMethod: String) throws -> URLRequest {
         do {
             let completeUrl = serverAddress! + apiSuffix
+            print(completeUrl)
             let url = URL(string: completeUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = httpMethod
@@ -82,11 +83,19 @@ final class JellyfinService: ObservableObject {
     func getLibraries() async throws -> [Library] {
         do {
             let req = try prepareAuthedRequest(apiSuffix: "/UserViews", httpMethod: "GET")
-
-            let (data, _) = try await URLSession.shared.data(for: req)
-            let decoded = try JSONDecoder().decode([Library].self, from: data)
             
-            print(decoded)
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            print(httpResponse.statusCode)
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode(LibraryResponse.self, from: data)
+            
+            return decoded.items
 
         } catch  {
             print(error)
@@ -100,28 +109,18 @@ final class JellyfinService: ObservableObject {
     func getLibrary(name: String) {
         
     }
-    func getContinueWatching() async throws {
+    func getContinueWatching() async throws -> [MediaItem] {
         do {
-            if (!isLoggedIn) {
-                throw AppErrors.notAuthenticatedError
-            }
-            let apiSuffix = "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video"
-            let completeUrl = serverAddress! + apiSuffix
-            
-            let url = URL(string: completeUrl)!
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
-            
+            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
+
             let (data, _) = try await URLSession.shared.data(for: request)
-            let _ = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
+            let response = try JSONDecoder().decode(ContinueWatchingResponse.self, from: data)
             
+            return response.items
 
         } catch  {
-            print(error)
+            throw (error)
         }
-
     }
     func randomLibraryItem() {
         
@@ -142,7 +141,7 @@ final class JellyfinService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
+            request.setValue(try getAuthHeader(), forHTTPHeaderField: "Authorization")
             
             
             let body = ["Username": username, "Pw": password]
@@ -160,10 +159,12 @@ final class JellyfinService: ObservableObject {
                     }
 
             let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
-            
+            userId = decoded.id
             print(decoded.accessToken)
+            print(decoded.id)
             UserDefaults().set(username, forKey: "username")
             UserDefaults().set(password, forKey: "password")
+            UserDefaults().set(userId, forKey: "userId")
             UserDefaults().set(serverAddress, forKey: "serverAddress")
             UserDefaults().set(deviceId, forKey: "deviceId")
             UserDefaults().set(decoded.accessToken, forKey: "accessToken")

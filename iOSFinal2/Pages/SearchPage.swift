@@ -9,14 +9,18 @@ import SwiftUI
 struct SearchPage: View {
     @State() var searchText: String = ""
     @State private var selectedFlavor: Flavor = .chocolate
+    @State private var libraries: [Library] = [];
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 TextField("Search", text: $searchText)
                 Picker("Flavor", selection: $selectedFlavor) {
                     Text("All Libraries").tag(Flavor.chocolate)
-                    Text("Movies").tag(Flavor.vanilla)
-                    Text("TV").tag(Flavor.strawberry)
+                    ForEach(libraries) {
+                        library in
+                        Text(library.name)
+                    }
                 }
             }
             if searchText == "" {
@@ -69,7 +73,15 @@ struct SearchPage: View {
         .padding()
         .textFieldStyle(.roundedBorder)
         .frame(maxHeight: .infinity)
+        .task {
+            do {
+                libraries = try await JellyfinService.shared.getLibraries()
+                print(libraries)
+            } catch {
+                print("error")
+            }
 
+        }
     }
 
 }

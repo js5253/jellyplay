@@ -8,6 +8,8 @@
 struct ServerLoginResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken = "AccessToken"
+        case id = "Id"
     }
     let accessToken:  String
+    let id: String
 }

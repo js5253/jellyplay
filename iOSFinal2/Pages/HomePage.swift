@@ -15,6 +15,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
 struct HomePage: View {
     @State private var selectedTab: Tabs = .watchNow
     @State private var libraries: [Library] = [];
+    @State private var continueWatching: [MediaItem] = [];
     var media = [MediaItem(name: "Happy Feet 2")]
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
@@ -28,7 +29,7 @@ struct HomePage: View {
                 MediaItem(name: "Love on a Leash"),
             ])
             ScrollView {
-                ItemSection(heading: "Continue Watching", items: media)
+                ItemSection(heading: "Continue Watching", items: continueWatching)
                 ItemSection(heading: "Next Up", items: media)
                 VStack {
                     Text("Looking for something new?").font(.title2)
@@ -57,6 +58,7 @@ struct HomePage: View {
         }.task {
             do {
                 libraries = try await JellyfinService.shared.getLibraries()
+                continueWatching = try await JellyfinService.shared.getContinueWatching()
                 print(libraries)
             } catch {
                 print("error")

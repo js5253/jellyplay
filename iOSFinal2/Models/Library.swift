@@ -1,6 +1,6 @@
 
 
-struct Library: Codable {
+struct Library: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "Id"
         case name = "Name"
@@ -12,4 +12,11 @@ struct Library: Codable {
     var childCount: Int
     var itemType: String
     
+}
+
+struct LibraryResponse: Codable {
+    enum CodingKeys: String, CodingKey {
+        case items = "Items"
+    }
+    var items: [Library]
 }
