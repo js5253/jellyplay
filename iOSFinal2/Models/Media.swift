@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum MediaType {
+enum MediaType: Codable {
     case Episode, Show, Movie, Season
 }
 
@@ -25,6 +25,7 @@ struct MediaItem: Identifiable, Hashable, Codable {
     let name: String
 //    let itemDescription: String?
     var id: String { name }
+    var itemType: MediaType
 }
 
 extension MediaItem: Mediable {
@@ -46,9 +47,6 @@ extension MediaItem: Mediable {
     
     var backgroundImage: Image? {
         return nil
-    }
-    var itemType: MediaType {
-        return .Movie
     }
     
 }

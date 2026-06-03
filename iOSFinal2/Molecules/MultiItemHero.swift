@@ -53,11 +53,6 @@ struct MultiItemHero: View {
                                 } label: {
                                     Label("Watch Now", systemImage: "play")
                                 }.buttonStyle(.glass)
-//                                NavigationLink {
-//                                    NowPlayingPage()
-//                                } label: {
-//                                    Label("More Details", systemImage: "info")
-//                                }
                             }
                         }.frame(height: 200.0).containerRelativeFrame(
                             .horizontal
@@ -99,10 +94,10 @@ struct MultiItemHero: View {
 }
 #Preview {
     MultiItemHero(items: [
-        MediaItem(name: "The Bee Movie"),
-        MediaItem(name: "The LEGO Movie"),
-        MediaItem(name: "The Emoji Movie"),
-        MediaItem(name: "CATS: The Movie"),
-        MediaItem(name: "Love on a Leash"),
+        MediaItem(name: "The Bee Movie", itemType: .Movie),
+        MediaItem(name: "The LEGO Movie", itemType: .Movie),
+        MediaItem(name: "The Emoji Movie", itemType: .Movie),
+        MediaItem(name: "CATS: The Movie", itemType: .Movie),
+        MediaItem(name: "Love on a Leash", itemType: .Movie),
     ])
 }

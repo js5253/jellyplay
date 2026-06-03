@@ -67,6 +67,7 @@ final class JellyfinService: ObservableObject {
     }
     private func prepareAuthedRequest(apiSuffix: String, httpMethod: String) throws -> URLRequest {
         do {
+            if (serverAddress == nil) {throw AppErrors.notAuthenticatedError}
             let completeUrl = serverAddress! + apiSuffix
             print(completeUrl)
             let url = URL(string: completeUrl)!
@@ -111,6 +112,7 @@ final class JellyfinService: ObservableObject {
     }
     func getContinueWatching() async throws -> [MediaItem] {
         do {
+            if (userId == nil) {throw AppErrors.notAuthenticatedError}
             let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
 
             let (data, _) = try await URLSession.shared.data(for: request)
@@ -173,10 +175,11 @@ final class JellyfinService: ObservableObject {
             isLoggedIn = true
             
         } catch {
-            print(error)
+            ErrorService.shared.handleError(description: error)
+            
         }
     }
-    func serverBase() -> String {
+    func serverBase() -> String? {
         let serverAddress = UserDefaults().string(forKey: "serverAddress") ?? "";
 
         return serverAddress

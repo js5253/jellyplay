@@ -13,20 +13,21 @@ enum Tabs: Equatable, Hashable, Identifiable {
 }
 
 struct HomePage: View {
+    ///TODO: make this more modular
     @State private var selectedTab: Tabs = .watchNow
     @State private var libraries: [Library] = [];
     @State private var continueWatching: [MediaItem] = [];
-    var media = [MediaItem(name: "Happy Feet 2")]
+    var media = [MediaItem(name: "Happy Feet 2", itemType: .Movie)]
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
         VStack(alignment: .leading) {
             Text("Watch Now").font(.title).bold().padding()
             MultiItemHero(items: [
-                MediaItem(name: "The Bee Movie"),
-                MediaItem(name: "The LEGO Movie"),
-                MediaItem(name: "The Emoji Movie"),
-                MediaItem(name: "CATS: The Movie"),
-                MediaItem(name: "Love on a Leash"),
+                MediaItem(name: "The Bee Movie", itemType: .Show),
+                MediaItem(name: "The LEGO Movie", itemType: .Movie),
+                MediaItem(name: "The Emoji Movie", itemType: .Movie),
+                MediaItem(name: "CATS: The Movie", itemType: .Show),
+                MediaItem(name: "Love on a Leash", itemType: .Show),
             ])
             ScrollView {
                 ItemSection(heading: "Continue Watching", items: continueWatching)

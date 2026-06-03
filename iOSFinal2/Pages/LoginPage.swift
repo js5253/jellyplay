@@ -13,62 +13,73 @@ struct LoginPage: View {
     @State var isCurrentlyCheckingServer: Bool = false
 
     var body: some View {
-        VStack {
-            Text("Sign in to your Jellyfin server").font(.title)
-            Text("Server Address")
-            HStack {
-                TextField(
-                    text: $serverAddress,
-                    label: { Text(verbatim: "https://example.com") }
-                )
-                .keyboardType(.URL)
+        HStack(alignment: .bottom) {
+            Divider()
+            VStack {
+                Text("Sign in to your Jellyfin server").font(.title)
+                
+                HStack {
+                    Text("Server Address")
+                    TextField(
+                        text: $serverAddress,
+                        label: { Text(verbatim: "https://example.com") }
+                    )
+                    .keyboardType(.URL)
+                }
                 Button(action: {
                     Task {
                         isCurrentlyCheckingServer = true
-
+                        
                         do {
                             try await JellyfinService.shared.getServerConfig(
                                 serverBase: serverAddress
                             )
                         } catch {
-
+                            
                         }
-
+                        
                     }
                 }) {
-                    Image(systemName: "star.fill").foregroundStyle(
-                        isCurrentlyCheckingServer ? .red : .black
-                    )
+                    Text("Validate Server")
                 }
-            }
-            Text("Username")
-            TextField(text: $serverUsername, label: { Text("") })
-
-            Text("Password")
-            SecureField(text: $serverPassword, label: { Text("") })
-
-            Button(action: {
-                Task {
-                    isCurrentlyCheckingServer = true
-                    try await JellyfinService.shared.logIn(
-                        serverAddress: serverAddress,
-                        username: serverUsername,
-                        password: serverPassword
-                    )
-                    isCurrentlyCheckingServer = false
-                }
-            }) {
-                Label("Sign In", systemImage: "arrow.up")
-            }.background(.blue).clipShape(.buttonBorder).frame(
-                maxWidth: .infinity
-            ).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)
+                .frame(maxWidth: CGFloat.infinity)
+                .buttonStyle(.bordered)
                 .padding()
-        }
-        .autocorrectionDisabled()
-        .textInputAutocapitalization(.never)
-        .textFieldStyle(.roundedBorder)
-        .padding()
-
+                HStack {
+                    Text("Username")
+                    TextField(text: $serverUsername, label: { Text("") })
+                }
+                HStack {
+                    Text("Password")
+                    SecureField(text: $serverPassword, label: { Text("") })
+                }
+                
+                Button(action: {
+                    Task {
+                        isCurrentlyCheckingServer = true
+                        try await JellyfinService.shared.logIn(
+                            serverAddress: serverAddress,
+                            username: serverUsername,
+                            password: serverPassword
+                        )
+                        isCurrentlyCheckingServer = false
+                    }
+                }) {
+                    Label("Sign In", systemImage: "arrow.up")
+                        .padding()
+                }.background(.blue).clipShape(.buttonBorder).frame(
+                    maxWidth: .infinity
+                ).foregroundStyle(.white).disabled(isCurrentlyCheckingServer)
+                    
+            }
+            .frame(maxWidth: CGFloat.infinity)
+            .padding()
+            .background(Color.white)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .textFieldStyle(.roundedBorder)
+            
+        }.background(Color.gray)
     }
 }
 

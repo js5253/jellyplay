@@ -43,9 +43,9 @@ struct ContentView: View {
             switch(jellyfinService.isLoading) {
             case true:
                 ProgressView("Loading...")
-                    .progressViewStyle(.circular) // Ensures a circular spinner
-                    .tint(.blue)                  // Changes the spinner color
-                    .controlSize(.large)          // Makes the spinner larger (iOS 15+)
+                    .progressViewStyle(.circular) 
+                    .tint(.blue)
+                    .controlSize(.large)
             case false:
                 switch(jellyfinService.isLoggedIn) {
                 case true:

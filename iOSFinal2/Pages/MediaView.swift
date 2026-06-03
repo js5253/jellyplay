@@ -62,5 +62,5 @@ struct MediaView: View {
 }
 
 #Preview {
-    MediaView(item: MediaItem(name: "The Bee Movie"))
+    MediaView(item: MediaItem(name: "The Bee Movie", itemType: .Show))
 }

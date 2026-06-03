@@ -44,6 +44,6 @@ struct ItemSection: View {
 #Preview(traits: .sizeThatFitsLayout) {
     ItemSection(
         heading: "AAAA",
-        items: [MediaItem(name: "Happy Feet 2"), MediaItem(name: "Happy Feet 3"), MediaItem(name: "Happy Feet 4"), MediaItem(name: "Happy Feet 5")]
+        items: [MediaItem(name: "Happy Feet 2", itemType: .Movie), MediaItem(name: "Happy Feet 3", itemType: .Movie), MediaItem(name: "Happy Feet 4", itemType: .Movie), MediaItem(name: "Happy Feet 5", itemType: .Movie)]
     )
 }
