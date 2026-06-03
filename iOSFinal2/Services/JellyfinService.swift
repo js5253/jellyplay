@@ -13,35 +13,35 @@ enum AppErrors: Error {
 }
 
 final class JellyfinService: ObservableObject {
-    static var shared: JellyfinService = {
+    static var shared = JellyfinService()
+    
+    private let serverAddress: String?
+    private let userId: String?
+    private var accessToken: String?
+    private let deviceId: String?
+    
+    init() {
         let serverAddress = UserDefaults().string(forKey: "serverAddress");
         let userId = UserDefaults().string(forKey: "userId");
         let accessToken = UserDefaults().string(forKey: "accessToken");
         let deviceId = UserDefaults().string(forKey: "deviceId");
-        if ((serverAddress) != nil) {
-            return JellyfinService(serverAddress: serverAddress, userId: userId, accessToken: accessToken, deviceId: deviceId)
-            
-        } else {
-            return JellyfinService(serverAddress: nil, userId: nil, accessToken: nil, deviceId: nil)
-        }
-        // setup code
         
-    }()
-    private let serverAddress: String?
-    private let userId: String?
-    private let accessToken: String?
-    private let deviceId: String?
-    
-
-    
-    init(serverAddress: String?, userId: String?, accessToken: String?, deviceId: String?) {
         self.serverAddress = serverAddress
         self.userId = userId
         self.accessToken = accessToken
         self.deviceId = deviceId
+        isLoggedIn = serverAddress != nil
+        
+        ///TODO: validate that current token is used.
+        
+        isLoading = false
+        
     }
-    
+
     @Published var isLoggedIn: Bool = false
+    
+    // used as it's checking to make sure current token is authenticated.
+    @Published var isLoading: Bool = true
 
     func getServerConfig(serverBase: String) async throws {
         let apiSuffix = "/System/Info/Public"
@@ -58,33 +58,35 @@ final class JellyfinService: ObservableObject {
         }
         
     }
-    private func getAuthHeader() -> String {
+    private func getAuthHeader() throws -> String {
         if (!isLoggedIn) {
-            return ""
+            throw AppErrors.notAuthenticatedError
         }
-        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + " Token=\"" + accessToken! + "\", Version=\"0.0.1\""
+        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + "\" Token=\"" + accessToken! + "\", Version=\"0.0.1\""
 
+    }
+    private func prepareAuthedRequest(apiSuffix: String, httpMethod: String) throws -> URLRequest {
+        do {
+            let completeUrl = serverAddress! + apiSuffix
+            let url = URL(string: completeUrl)!
+            var request = URLRequest(url: url)
+            request.httpMethod = httpMethod
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(try getAuthHeader(), forHTTPHeaderField: "Authorization")
+            
+            return request;
+        } catch {
+            throw error
+        }
     }
     func getLibraries() async throws -> [Library] {
         do {
-            if (serverAddress == nil || userId == nil) {
-                throw AppErrors.notAuthenticatedError
-            }
+            let req = try prepareAuthedRequest(apiSuffix: "/UserViews", httpMethod: "GET")
+
+            let (data, _) = try await URLSession.shared.data(for: req)
+            let decoded = try JSONDecoder().decode([Library].self, from: data)
             
-            let apiSuffix = "/UserViews"
-            let completeUrl = serverAddress! + apiSuffix
-            
-            let url = URL(string: completeUrl)!
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            
-            
-            
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
-            
-            print(decoded.accessToken)
+            print(decoded)
 
         } catch  {
             print(error)
@@ -100,10 +102,9 @@ final class JellyfinService: ObservableObject {
     }
     func getContinueWatching() async throws {
         do {
-            if (serverAddress == nil || userId == nil) {
+            if (!isLoggedIn) {
                 throw AppErrors.notAuthenticatedError
             }
-            
             let apiSuffix = "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video"
             let completeUrl = serverAddress! + apiSuffix
             
@@ -113,12 +114,9 @@ final class JellyfinService: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
             
-            
-            
             let (data, _) = try await URLSession.shared.data(for: request)
-            let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
+            let _ = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
             
-            print(decoded.accessToken)
 
         } catch  {
             print(error)
@@ -158,7 +156,7 @@ final class JellyfinService: ObservableObject {
             }
             print(httpResponse.statusCode)
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
-                        print(textContent)
+                print(textContent)
                     }
 
             let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
@@ -170,6 +168,7 @@ final class JellyfinService: ObservableObject {
             UserDefaults().set(deviceId, forKey: "deviceId")
             UserDefaults().set(decoded.accessToken, forKey: "accessToken")
             
+            accessToken = decoded.accessToken
             isLoggedIn = true
             
         } catch {

@@ -40,11 +40,19 @@ struct ContentView: View {
     @EnvironmentObject var jellyfinService: JellyfinService
     var body: some View {
         Group {
-            switch(jellyfinService.isLoggedIn) {
+            switch(jellyfinService.isLoading) {
             case true:
-                RootLoggedInView()
+                ProgressView("Loading...")
+                    .progressViewStyle(.circular) // Ensures a circular spinner
+                    .tint(.blue)                  // Changes the spinner color
+                    .controlSize(.large)          // Makes the spinner larger (iOS 15+)
             case false:
-                LoginPage()
+                switch(jellyfinService.isLoggedIn) {
+                case true:
+                    RootLoggedInView()
+                case false:
+                    LoginPage()
+                }
             }
         }
     }
