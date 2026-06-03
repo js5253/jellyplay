@@ -92,7 +92,7 @@ struct MultiItemHero: View {
         }
         .onChange(of: x) {
             withAnimation {
-                scrollPosition.scrollTo(x: CGFloat(x * 260))
+                scrollPosition.scrollTo(x: CGFloat(x * 290))
             }
         }
     }

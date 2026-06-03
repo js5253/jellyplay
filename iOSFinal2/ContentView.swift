@@ -23,10 +23,10 @@ struct RootLoggedInView: View {
                 Tab("Search", systemImage: "gear", value: .search) {
                     SearchPage()
                 }
-                Tab("Watchlist", systemImage: "gear", value: .watchlist) {
+                Tab("Watchlist", systemImage: "bookmark", value: .watchlist) {
                     WatchlistPage()
                 }
-                Tab("Settings", systemImage: "gear", value: .settings) {
+                Tab("Settings", systemImage: "magnifyingglass", value: .settings) {
                     SettingsPage()
                 }
             }
@@ -36,24 +36,25 @@ struct RootLoggedInView: View {
 
 
 struct ContentView: View {
-    @State var currentView: RootNavigationDestination;
-//    @State var currentView: RootNavigationDestination = JellyfinService.shared.isLoggedIn() ? .homePage : .loading
+//    @State var currentView: RootNavigationDestination;
+    @EnvironmentObject var jellyfinService: JellyfinService
     var body: some View {
-        switch(currentView) {
-        case .loading:
-            ProgressView("Loading Data...")
-        case .homePage:
-            RootLoggedInView()
-        case .loginPage:
-            LoginPage()
+        Group {
+            switch(jellyfinService.isLoggedIn) {
+            case true:
+                RootLoggedInView()
+            case false:
+                LoginPage()
+            }
         }
     }
 }
+    
 
         
     
 
 
 #Preview {
-    ContentView(currentView: .loginPage)
+    ContentView()
 }

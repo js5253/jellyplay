@@ -15,7 +15,7 @@ struct Hero: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if ((tag) != nil) {Text(tag!).font(.caption).padding(4.0).background(Color.green).clipShape(.buttonBorder)}
+            if ((tag) != nil) {Text(tag!).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)}
             Text(title).font(.largeTitle).bold()
             if ((subtitle) != nil) {Text(subtitle!).font(.callout).lineLimit(2).truncationMode(.tail)}
 
@@ -32,5 +32,5 @@ struct Hero: View {
     }
 }
 #Preview {
-    Hero(tag: "Continue Watching", title: "Hello World!", subtitle: "S1E1: Pilot - 46m", description: "some long long long long long goln text some long long long long long goln text some long long long long long goln text some long long long long long goln text ")
+    Hero(tag: "Continue Watching", title: "House (2006)", subtitle: "S1E1: Pilot - 46m", description: "some long long long long long goln text some long long long long long goln text some long long long long long goln text some long long long long long goln text ")
 }

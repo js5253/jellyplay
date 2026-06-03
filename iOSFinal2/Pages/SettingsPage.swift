@@ -11,8 +11,9 @@ struct SettingsPage: View {
         VStack {
             Text("Settings").font(.largeTitle)
             List {
-                Text("Current Server: \(JellyfinService.shared.serverBase())")
-                Button("Log Out", role: .destructive, action: {})
+                Section(JellyfinService.shared.serverBase()) {
+                    Button("Log Out", role: .destructive, action: {})
+                }
             }
         }
     }

@@ -6,23 +6,43 @@
 //
 
 import Foundation
+internal import Combine
 enum AppErrors: Error {
     case invalid
+    case notAuthenticatedError
 }
-struct JellyfinService {
+
+final class JellyfinService: ObservableObject {
     static var shared: JellyfinService = {
         let serverAddress = UserDefaults().string(forKey: "serverAddress");
+        let userId = UserDefaults().string(forKey: "userId");
+        let accessToken = UserDefaults().string(forKey: "accessToken");
+        let deviceId = UserDefaults().string(forKey: "deviceId");
         if ((serverAddress) != nil) {
-            return JellyfinService(serverAddress: serverAddress)
+            return JellyfinService(serverAddress: serverAddress, userId: userId, accessToken: accessToken, deviceId: deviceId)
             
         } else {
-            return JellyfinService(serverAddress: nil)
+            return JellyfinService(serverAddress: nil, userId: nil, accessToken: nil, deviceId: nil)
         }
         // setup code
         
     }()
     private let serverAddress: String?
+    private let userId: String?
+    private let accessToken: String?
+    private let deviceId: String?
     
+
+    
+    init(serverAddress: String?, userId: String?, accessToken: String?, deviceId: String?) {
+        self.serverAddress = serverAddress
+        self.userId = userId
+        self.accessToken = accessToken
+        self.deviceId = deviceId
+    }
+    
+    @Published var isLoggedIn: Bool = false
+
     func getServerConfig(serverBase: String) async throws {
         let apiSuffix = "/System/Info/Public"
         let completeUrl = serverBase + apiSuffix
@@ -31,23 +51,76 @@ struct JellyfinService {
         do {
             let url = URL(string: completeUrl)!
             let (data, _) = try await URLSession.shared.data(from: url)
-            let decoded = try JSONDecoder().decode(ServerConfigResponse.self, from: data)
-            
-            JellyfinService.shared = JellyfinService(serverAddress: serverBase)
+            let _ = try JSONDecoder().decode(ServerConfigResponse.self, from: data)
             
         } catch {
             print(error)
         }
         
     }
-    func getLibraries() {
-        
+    private func getAuthHeader() -> String {
+        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"(deviceId)\" Token=\"(item)\", Version=\"10.11.10\""
+
+    }
+    func getLibraries() async throws -> [Library] {
+        do {
+            if (serverAddress == nil || userId == nil) {
+                throw AppErrors.notAuthenticatedError
+            }
+            
+            let apiSuffix = "/UserViews"
+            let completeUrl = serverAddress! + apiSuffix
+            
+            let url = URL(string: completeUrl)!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            
+            
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
+            
+            print(decoded.accessToken)
+
+        } catch  {
+            print(error)
+        }
+        return []
+
     }
     func getWatchlist() {
         
     }
     func getLibrary(name: String) {
         
+    }
+    func getContinueWatching() async throws {
+        do {
+            if (serverAddress == nil || userId == nil) {
+                throw AppErrors.notAuthenticatedError
+            }
+            
+            let apiSuffix = "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video"
+            let completeUrl = serverAddress! + apiSuffix
+            
+            let url = URL(string: completeUrl)!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
+            
+            
+            
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
+            
+            print(decoded.accessToken)
+
+        } catch  {
+            print(error)
+        }
+
     }
     func randomLibraryItem() {
         
@@ -62,26 +135,33 @@ struct JellyfinService {
             let apiSuffix = "/Users/authenticatebyname"
             let completeUrl = serverAddress + apiSuffix
             print("Final URL: \(completeUrl)")
-            
+            let deviceId = UUID().uuidString
             
             let url = URL(string: completeUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("MediaBrowser Client=\"Jellyfin Web\", Device=\"Firefox\", DeviceId=\"TW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTAuMTU7IHJ2OjE1MC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94LzE1MC4wfDE3Nzk4MTE2NDQxODU1\", Version=\"10.11.10\"", forHTTPHeaderField: "Authorization")
-            
+            request.setValue(getAuthHeader(), forHTTPHeaderField: "Authorization")
+
             
             let body = ["Username": username, "Pw": password]
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
             
             let (data, _) = try await URLSession.shared.data(for: request)
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use  
+                        print(textContent)
+                    }
+
             let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
             
             print(decoded.accessToken)
             UserDefaults().set(username, forKey: "username")
             UserDefaults().set(password, forKey: "password")
             UserDefaults().set(serverAddress, forKey: "serverAddress")
+            UserDefaults().set(deviceId, forKey: "deviceId")
             UserDefaults().set(decoded.accessToken, forKey: "accessToken")
+            
+            isLoggedIn = true
             
         } catch {
             print(error)
@@ -93,10 +173,4 @@ struct JellyfinService {
         return serverAddress
     }
     
-    func isLoggedIn() -> Bool {
-        let serverAddress = UserDefaults().string(forKey: "serverAddress");
-        
-        return serverAddress != nil
-        
-    }
 }

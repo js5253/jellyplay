@@ -14,10 +14,12 @@ enum Tabs: Equatable, Hashable, Identifiable {
 
 struct HomePage: View {
     @State private var selectedTab: Tabs = .watchNow
+    @State private var libraries: [Library] = [];
     var media = [MediaItem(name: "Happy Feet 2")]
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
         VStack(alignment: .leading) {
+            Text("Watch Now").font(.title).bold().padding()
             MultiItemHero(items: [
                 MediaItem(name: "The Bee Movie"),
                 MediaItem(name: "The LEGO Movie"),
@@ -51,6 +53,13 @@ struct HomePage: View {
                 ItemSection(heading: "Latest in Movies", items: media)
                 ItemSection(heading: "Latest in TV Shows", items: media)
 
+            }
+        }.task {
+            do {
+                libraries = try await JellyfinService.shared.getLibraries()
+                print(libraries)
+            } catch {
+                print("error")
             }
         }
     }
