@@ -62,7 +62,7 @@ struct HomePage: View {
                 continueWatching = try await JellyfinService.shared.getContinueWatching()
                 print(libraries)
             } catch {
-                print("error")
+                print(error)
             }
         }
     }
@@ -71,4 +71,5 @@ struct HomePage: View {
 
 #Preview {
     HomePage()
+    
 }

@@ -4,12 +4,17 @@
 //
 //  Created by jose on 5/26/26.
 //
-
+struct User: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id = "Id"
+    }
+    let id: String
+}
 struct ServerLoginResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken = "AccessToken"
-        case id = "Id"
+        case user = "User"
     }
     let accessToken:  String
-    let id: String
+    let user: User
 }

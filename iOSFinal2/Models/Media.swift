@@ -50,10 +50,20 @@ extension MediaItem: Mediable {
     }
     
 }
+init(from apiItem: JellyfinMediaItem) {
+    
+}
 
 struct ContinueWatchingResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case items = "Items"
     }
-    var items: [MediaItem]
+    var items: [JellyfinMediaItem]
+}
+
+struct JellyfinMediaItem: Codable {
+    enum CodingKeys: String, CodingKey {
+        case name = "Name"
+    }
+    var name: String
 }

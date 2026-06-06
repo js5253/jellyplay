@@ -37,7 +37,7 @@ final class JellyfinService: ObservableObject {
         isLoading = false
         
     }
-
+    @Published var userLibraries: [Library] = []
     @Published var isLoggedIn: Bool = false
     
     // used as it's checking to make sure current token is authenticated.
@@ -82,6 +82,7 @@ final class JellyfinService: ObservableObject {
         }
     }
     func getLibraries() async throws -> [Library] {
+        print(userId)
         do {
             let req = try prepareAuthedRequest(apiSuffix: "/UserViews", httpMethod: "GET")
             
@@ -111,6 +112,7 @@ final class JellyfinService: ObservableObject {
         
     }
     func getContinueWatching() async throws -> [MediaItem] {
+        print(userId)
         do {
             if (userId == nil) {throw AppErrors.notAuthenticatedError}
             let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
@@ -143,7 +145,6 @@ final class JellyfinService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(try getAuthHeader(), forHTTPHeaderField: "Authorization")
             
             
             let body = ["Username": username, "Pw": password]
@@ -158,12 +159,12 @@ final class JellyfinService: ObservableObject {
             print(httpResponse.statusCode)
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
                 print(textContent)
-                    }
+            }
 
             let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
-            userId = decoded.id
+            userId = decoded.user.id
             print(decoded.accessToken)
-            print(decoded.id)
+            print(userId)
             UserDefaults().set(username, forKey: "username")
             UserDefaults().set(password, forKey: "password")
             UserDefaults().set(userId, forKey: "userId")

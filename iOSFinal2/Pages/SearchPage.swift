@@ -8,15 +8,16 @@ import SwiftUI
 
 struct SearchPage: View {
     @State() var searchText: String = ""
-    @State private var selectedFlavor: Flavor = .chocolate
+    @State private var selectedLibrary: Season = .one
     @State private var libraries: [Library] = [];
+    var recentSearches:  [RecentSearch] = []
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 TextField("Search", text: $searchText)
-                Picker("Flavor", selection: $selectedFlavor) {
-                    Text("All Libraries").tag(Flavor.chocolate)
+                Picker("Libraries to Search", selection: $selectedLibrary) {
+                    Text("All Libraries")
                     ForEach(libraries) {
                         library in
                         Text(library.name)
@@ -26,9 +27,11 @@ struct SearchPage: View {
             if searchText == "" {
                 Text("Recent Searches").font(.title)
                 Label("'Icon'", systemImage: "magnifyingglass")
+                ForEach(recentSearches) {
+                    search in
+                    SearchRow(title: search.title, subtitle: search.subtitle)
+                }
                 Divider()
-                Text("House M.D. (2006)")
-                Text("TV - Watchlisted").font(.caption)
 
             } else {
                 Grid {
