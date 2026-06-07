@@ -17,21 +17,17 @@ struct HomePage: View {
     @State private var selectedTab: Tabs = .watchNow
     @State private var libraries: [Library] = [];
     @State private var continueWatching: [MediaItem] = [];
-    var media = [MediaItem(name: "Happy Feet 2", itemType: .Movie)]
+    @State private var nextUp: [MediaItem] = [];
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
         VStack(alignment: .leading) {
             Text("Watch Now").font(.title).bold().padding()
-            MultiItemHero(items: [
-                MediaItem(name: "The Bee Movie", itemType: .Show),
-                MediaItem(name: "The LEGO Movie", itemType: .Movie),
-                MediaItem(name: "The Emoji Movie", itemType: .Movie),
-                MediaItem(name: "CATS: The Movie", itemType: .Show),
-                MediaItem(name: "Love on a Leash", itemType: .Show),
-            ])
+            MultiItemHero(items:
+                continueWatching + nextUp
+            )
             ScrollView {
                 ItemSection(heading: "Continue Watching", items: continueWatching)
-                ItemSection(heading: "Next Up", items: media)
+                ItemSection(heading: "Next Up", items: nextUp)
                 VStack {
                     Text("Looking for something new?").font(.title2)
                     HStack {
@@ -51,16 +47,18 @@ struct HomePage: View {
                 }
                 .padding()
                 .glassEffect(in: .rect(cornerRadius: 16.0))
+                ForEach(libraries) {
+                    library in
+                    ItemSection(heading: "Latest in \(library.name)", items: [])
 
-                ItemSection(heading: "Latest in Movies", items: media)
-                ItemSection(heading: "Latest in TV Shows", items: media)
+                }
 
             }
         }.task {
             do {
                 libraries = try await JellyfinService.shared.getLibraries()
+                nextUp = try await JellyfinService.shared.getNextUp()
                 continueWatching = try await JellyfinService.shared.getContinueWatching()
-                print(libraries)
             } catch {
                 print(error)
             }
@@ -71,5 +69,6 @@ struct HomePage: View {
 
 #Preview {
     HomePage()
+        .environmentObject(JellyfinService.shared)
     
 }

@@ -46,7 +46,6 @@ final class JellyfinService: ObservableObject {
     func getServerConfig(serverBase: String) async throws {
         let apiSuffix = "/System/Info/Public"
         let completeUrl = serverBase + apiSuffix
-        print("Final URL: \(completeUrl)")
         
         do {
             let url = URL(string: completeUrl)!
@@ -54,6 +53,7 @@ final class JellyfinService: ObservableObject {
             let _ = try JSONDecoder().decode(ServerConfigResponse.self, from: data)
             
         } catch {
+            print(error)
             print(error)
         }
         
@@ -69,7 +69,6 @@ final class JellyfinService: ObservableObject {
         do {
             if (serverAddress == nil) {throw AppErrors.notAuthenticatedError}
             let completeUrl = serverAddress! + apiSuffix
-            print(completeUrl)
             let url = URL(string: completeUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = httpMethod
@@ -82,7 +81,6 @@ final class JellyfinService: ObservableObject {
         }
     }
     func getLibraries() async throws -> [Library] {
-        print(userId)
         do {
             let req = try prepareAuthedRequest(apiSuffix: "/UserViews", httpMethod: "GET")
             
@@ -90,13 +88,16 @@ final class JellyfinService: ObservableObject {
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw AppErrors.notAuthenticatedError
             }
-            print(httpResponse.statusCode)
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
                 print(textContent)
             }
 
             let decoded = try JSONDecoder().decode(LibraryResponse.self, from: data)
-            
+            let libraries = decoded.items
+            for library in decoded.items {
+                let content = try await getLibrary(parentId: library.id);
+//                library.items = content
+            }
             return decoded.items
 
         } catch  {
@@ -108,29 +109,134 @@ final class JellyfinService: ObservableObject {
     func getWatchlist() {
         
     }
-    func getLibrary(name: String) {
-        
+    func getItem(id: String) async throws -> MediaItem {
+        do {
+            if (serverAddress == nil || userId == nil) {throw AppErrors.notAuthenticatedError}
+
+            let req = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/\(id)", httpMethod: "GET")
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode(JellyfinMediaItem.self, from: data)
+            
+            return MediaItem(from: decoded)
+
+        } catch  {
+            print(error)
+        }
+        throw AppErrors.invalid
+
+
     }
+    func getPlaybackUrl(itemId: String) async throws -> URL {
+        do {
+            
+            if (serverAddress == nil) {throw AppErrors.notAuthenticatedError}
+
+            let apiSuffix = "/Videos/\(itemId)/stream.mp4?Static=true&mediaSourceId=\(itemId)&deviceId=\(deviceId!)&ApiKey=\(accessToken!)"
+            let completeUrl = serverAddress! + apiSuffix
+            guard let completeUrl = URL(string: completeUrl) else {
+                throw AppErrors.invalid
+            }
+            print(completeUrl)
+            return completeUrl
+        } catch {
+            throw error
+        }
+    }
+    
+    func getLibrary(parentId: String) async throws -> [MediaItem] {
+        do {
+            let req = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Latest?ParentId=\(parentId)", httpMethod: "GET")
+            
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode([MediaItem].self, from: data)
+            
+            return decoded
+
+        } catch  {
+            print(error)
+        }
+        return []
+
+    }
+    
     func getContinueWatching() async throws -> [MediaItem] {
-        print(userId)
         do {
             if (userId == nil) {throw AppErrors.notAuthenticatedError}
             let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
 
             let (data, _) = try await URLSession.shared.data(for: request)
-            let response = try JSONDecoder().decode(ContinueWatchingResponse.self, from: data)
+            let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
             
-            return response.items
+            return response.items.map({item in
+                MediaItem(from: item)
+            }
+            )
 
         } catch  {
             throw (error)
         }
     }
+    func getNextUp() async throws -> [MediaItem] {
+        
+        do {
+            if (userId == nil) {throw AppErrors.notAuthenticatedError}
+            let request = try prepareAuthedRequest(apiSuffix: "/Shows/NextUp?Limit=24&Fields=PrimaryImageAspectRatio,DateCreated,Path,MediaSourceCount&UserId=\(userId!)&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Banner,Thumb&EnableTotalRecordCount=false&DisableFirstEpisode=false&NextUpDateCutoff=2025-06-06T23:05:38.257Z&EnableResumable=false&EnableRewatching=false", httpMethod: "GET")
+
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            
+            return response.items.map({item in
+                MediaItem(from: item)
+            }
+            )
+
+        } catch  {
+            throw (error)
+        }
+    }
+
     func randomLibraryItem() {
         
     }
     
-    func search(query: String?, libraries: [String]) {
+    func search(query: String, libraries: [String]) async throws -> [MediaItem] {
+        // for now, skip library search
+        do {
+            let req = try prepareAuthedRequest(apiSuffix: "/Items?userId=\(userId!)&isMissing=false&limit=800&recursive=true&searchTerm=\(query)&fields=PrimaryImageAspectRatio&fields=CanDelete&fields=MediaSourceCount&includeItemTypes=Movie&includeItemTypes=Series&includeItemTypes=Episode&includeItemTypes=Playlist&includeItemTypes=MusicAlbum&includeItemTypes=Audio&includeItemTypes=TvChannel&includeItemTypes=PhotoAlbum&includeItemTypes=Photo&includeItemTypes=AudioBook&includeItemTypes=Book&includeItemTypes=BoxSet&imageTypeLimit=1&enableTotalRecordCount=false", httpMethod: "GET")
+            
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            
+            return decoded.items.map({item in
+                MediaItem(from: item)
+            })
+
+        } catch  {
+            print(error)
+        }
+        return []
+
         
     }
     
@@ -156,15 +262,12 @@ final class JellyfinService: ObservableObject {
             guard let httpResponse = response as? HTTPURLResponse else {
                 return
             }
-            print(httpResponse.statusCode)
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
                 print(textContent)
             }
 
             let decoded = try JSONDecoder().decode(ServerLoginResponse.self, from: data)
             userId = decoded.user.id
-            print(decoded.accessToken)
-            print(userId)
             UserDefaults().set(username, forKey: "username")
             UserDefaults().set(password, forKey: "password")
             UserDefaults().set(userId, forKey: "userId")

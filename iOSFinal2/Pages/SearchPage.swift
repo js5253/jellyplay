@@ -8,6 +8,7 @@ import SwiftUI
 
 struct SearchPage: View {
     @State() var searchText: String = ""
+    @State() var items: [MediaItem] = []
     @State private var selectedLibrary: Season = .one
     @State private var libraries: [Library] = [];
     var recentSearches:  [RecentSearch] = []
@@ -35,37 +36,13 @@ struct SearchPage: View {
 
             } else {
                 Grid {
-                    GridRow {
-                        Text("Hello")
-                        Image(systemName: "globe")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
-                    }
-                    GridRow {
-                        Image(systemName: "hand.wave")
-                        Text("World")
+                    ForEach(items) {
+                        media in
+                        NavigationLink {
+                            MediaView(id: media.id)
+                        } label: {
+                            Label(media.title, systemImage: "folder")
+                        }
                     }
                 }
 
@@ -76,6 +53,12 @@ struct SearchPage: View {
         .padding()
         .textFieldStyle(.roundedBorder)
         .frame(maxHeight: .infinity)
+        .onChange(of: searchText, {
+            oldVal, newVal in
+            Task {
+                items = try await JellyfinService.shared.search(query: searchText, libraries: [])
+            }
+        })
         .task {
             do {
                 libraries = try await JellyfinService.shared.getLibraries()

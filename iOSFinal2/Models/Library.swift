@@ -5,12 +5,14 @@ struct Library: Codable, Identifiable {
         case id = "Id"
         case name = "Name"
         case childCount = "ChildCount"
-        case itemType = "ItemType"
+        case items = "items"
+//        case itemType = "ItemType"
     }
     var name: String
     var id: String
     var childCount: Int
-    var itemType: String
+//    var itemType: String
+    let items: [MediaItem]
     
 }
 

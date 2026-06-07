@@ -28,8 +28,9 @@ struct MultiItemHero: View {
                     }
                 }.frame(height: 200.0)
                 HStack {
-                    ForEach(items) {
-                        item in
+                    ForEach(Array(items.enumerated()), id: \.offset) {
+                        idx, item in
+                        
                         VStack(alignment: .leading) {
                             if (item.tag) != nil {
                                 Text(item.tag!).font(.caption).padding(4.0)
@@ -49,14 +50,14 @@ struct MultiItemHero: View {
                             }
                             HStack {
                                 NavigationLink {
-                                    MediaView(item: item)
+//                                    MediaView(id: "3")
+                                    NowPlayingPage(item: item)
                                 } label: {
                                     Label("Watch Now", systemImage: "play")
                                 }.buttonStyle(.glass)
                             }
-                        }.frame(height: 200.0).containerRelativeFrame(
-                            .horizontal
-                        ) {
+                        }.frame(height: 200.0)
+                            .containerRelativeFrame(.horizontal) {
                             size,
                             axis in
                             size * 0.8
@@ -75,6 +76,7 @@ struct MultiItemHero: View {
             }
 
         }
+        .scrollTargetBehavior(.viewAligned)
         .scrollPosition($scrollPosition)
         .onReceive(timer) {
             _ in
@@ -94,10 +96,10 @@ struct MultiItemHero: View {
 }
 #Preview {
     MultiItemHero(items: [
-        MediaItem(name: "The Bee Movie", itemType: .Movie),
-        MediaItem(name: "The LEGO Movie", itemType: .Movie),
-        MediaItem(name: "The Emoji Movie", itemType: .Movie),
-        MediaItem(name: "CATS: The Movie", itemType: .Movie),
-        MediaItem(name: "Love on a Leash", itemType: .Movie),
+        MediaItem(name: "The Bee Movie", itemType: MediaType.Movie, id: "1"),
+        MediaItem(name: "The LEGO Movie", itemType: .Movie, id: "2"),
+        MediaItem(name: "The Emoji Movie", itemType: .Movie, id: "3"),
+        MediaItem(name: "CATS: The Movie", itemType: .Movie, id: "4"),
+        MediaItem(name: "Love on a Leash", itemType: .Movie, id: "5"),
     ])
 }

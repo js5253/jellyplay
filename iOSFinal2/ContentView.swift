@@ -37,17 +37,17 @@ struct RootLoggedInView: View {
 
 struct ContentView: View {
 //    @State var currentView: RootNavigationDestination;
-    @EnvironmentObject var jellyfinService: JellyfinService
+//    @EnvironmentObject var jellyfinService: JellyfinService
     var body: some View {
         Group {
-            switch(jellyfinService.isLoading) {
+            switch(JellyfinService.shared.isLoading) {
             case true:
                 ProgressView("Loading...")
                     .progressViewStyle(.circular) 
                     .tint(.blue)
                     .controlSize(.large)
             case false:
-                switch(jellyfinService.isLoggedIn) {
+                switch(JellyfinService.shared.isLoggedIn) {
                 case true:
                     RootLoggedInView()
                 case false:

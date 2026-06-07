@@ -30,7 +30,7 @@ struct ItemSection: View {
                             
                         }
                         .navigationDestination(for: MediaItem.self) { item in
-                            MediaView(item: item)
+                            MediaView(id: "2")
                         }
                     }
                 }
@@ -43,7 +43,7 @@ struct ItemSection: View {
 
 #Preview(traits: .sizeThatFitsLayout) {
     ItemSection(
-        heading: "AAAA",
-        items: [MediaItem(name: "Happy Feet 2", itemType: .Movie), MediaItem(name: "Happy Feet 3", itemType: .Movie), MediaItem(name: "Happy Feet 4", itemType: .Movie), MediaItem(name: "Happy Feet 5", itemType: .Movie)]
+        heading: "Continue Watching",
+        items: [MediaItem(name: "Happy Feet 2", itemType: .Movie, id: "1"), MediaItem(name: "Happy Feet 3", itemType: .Movie, id: "2"), MediaItem(name: "Happy Feet 4", itemType: .Movie, id: "3"), MediaItem(name: "Happy Feet 5", itemType: .Movie, id: "4")]
     )
 }
