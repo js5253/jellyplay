@@ -75,6 +75,7 @@ final class JellyfinService: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(try getAuthHeader(), forHTTPHeaderField: "Authorization")
             
+            
             return request;
         } catch {
             throw error
@@ -96,14 +97,13 @@ final class JellyfinService: ObservableObject {
             let libraries = decoded.items
             for library in decoded.items {
                 let content = try await getLibrary(parentId: library.id);
-//                library.items = content
+
             }
             return decoded.items
 
         } catch  {
-            print(error)
+            throw error
         }
-        return []
 
     }
     func getWatchlist() {
@@ -135,7 +135,6 @@ final class JellyfinService: ObservableObject {
     }
     func getPlaybackUrl(itemId: String) async throws -> URL {
         do {
-            
             if (serverAddress == nil) {throw AppErrors.notAuthenticatedError}
 
             let apiSuffix = "/Videos/\(itemId)/stream.mp4?Static=true&mediaSourceId=\(itemId)&deviceId=\(deviceId!)&ApiKey=\(accessToken!)"
@@ -189,6 +188,45 @@ final class JellyfinService: ObservableObject {
         } catch  {
             throw (error)
         }
+    }
+    func checkIfWatchlistExists() {
+        
+    }
+    func makeWatchlist() async throws {
+        do {
+            if (userId == nil) {throw AppErrors.notAuthenticatedError}
+            var request = try prepareAuthedRequest(apiSuffix: "/Playlists", httpMethod: "POST")
+            let parameters: [String: Any] = [
+                "Name": "Watchlist",
+                "IsPublic": false,
+                "Ids": [],
+                "UserId": userId!
+            ]
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters);
+            let (data, req) = try await URLSession.shared.data(for: request)
+            
+            
+            
+            
+
+        } catch  {
+            throw (error)
+        }
+
+    }
+    func getWatchlist() async throws {
+        do {
+            if (userId == nil) {throw AppErrors.notAuthenticatedError}
+            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items?StartIndex=0&Limit=10&Fields=PrimaryImageAspectRatio%2CSortName%2CPath%2CChildCount%2CMediaSourceCount%2CPrimaryImageAspectRatio&ImageTypeLimit=1&SortBy=IsFolder%2CSortName&SortOrder=Ascending", httpMethod: "GET")
+
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            print(response)
+            
+        } catch  {
+            throw (error)
+        }
+
     }
     func getNextUp() async throws -> [MediaItem] {
         

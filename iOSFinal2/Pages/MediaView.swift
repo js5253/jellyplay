@@ -32,7 +32,6 @@ struct MediaView: View {
             VStack {
                 Hero(title: item!.title)
                 ScrollView {
-                    
                     if (item!.description != nil) {
                         Text(item!.description!)
                     }

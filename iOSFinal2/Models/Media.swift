@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum MediaType: Codable {
+enum MediaType: String, Codable {
     case Episode, Show, Movie, Season, Video, Unknown
 }
 
@@ -20,17 +20,21 @@ protocol Mediable {
     var itemType: MediaType {get}
 
 }
-
+struct ImageBlurhashes: Hashable, Codable {
+    let backdrop: Dictionary<String, String>
+}
 struct MediaItem: Identifiable, Hashable, Codable {
     let name: String
     var id: String
     let itemType: MediaType
     let description: String?
+    let imageBlurhashes: ImageBlurhashes?
     init(from: JellyfinMediaItem) {
         self.name = from.name
         self.itemType = from.mediaType
         self.id = from.id;
         self.description = from.description;
+        self.imageBlurhashes = from.imageBlurhashes
 
     }
     init(name: String, itemType: MediaType, id: String) {
@@ -38,6 +42,7 @@ struct MediaItem: Identifiable, Hashable, Codable {
         self.id = id;
         self.itemType = itemType;
         self.description = nil
+        self.imageBlurhashes = nil
     }
     
     
@@ -82,7 +87,8 @@ struct JellyfinMediaItem: Codable {
     }
     var name: String
     var id: String
+    var imageBlurhashes: ImageBlurhashes?
     var description: String?
-    var taglines: [String]
+    var taglines: [String]?
     var mediaType: MediaType
 }

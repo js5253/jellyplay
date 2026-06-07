@@ -7,11 +7,13 @@
 import SwiftUI
 struct SearchRow : View {
     var title: String
-    var subtitle: String
+    var subtitle: String?
     var body: some View {
         VStack {
             Text(title)
-            Text(subtitle).font(.caption)
+            if (subtitle != nil) {
+                Text(subtitle!).font(.caption)
+            }
         }.padding()
 
     }

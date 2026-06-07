@@ -14,7 +14,7 @@ struct SearchPage: View {
     var recentSearches:  [RecentSearch] = []
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack() {
             HStack {
                 TextField("Search", text: $searchText)
                 Picker("Libraries to Search", selection: $selectedLibrary) {
@@ -41,7 +41,7 @@ struct SearchPage: View {
                         NavigationLink {
                             MediaView(id: media.id)
                         } label: {
-                            Label(media.title, systemImage: "folder")
+                            SearchRow(title: media.title, subtitle: media.subtitle)
                         }
                     }
                 }
@@ -50,9 +50,10 @@ struct SearchPage: View {
 
         }
         
+        
         .padding()
         .textFieldStyle(.roundedBorder)
-        .frame(maxHeight: .infinity)
+        .frame(maxHeight: .infinity, alignment: .top)
         .onChange(of: searchText, {
             oldVal, newVal in
             Task {
@@ -68,6 +69,7 @@ struct SearchPage: View {
             }
 
         }
+        
     }
 
 }

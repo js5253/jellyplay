@@ -59,6 +59,7 @@ struct HomePage: View {
                 libraries = try await JellyfinService.shared.getLibraries()
                 nextUp = try await JellyfinService.shared.getNextUp()
                 continueWatching = try await JellyfinService.shared.getContinueWatching()
+                try await JellyfinService.shared.getWatchlist()
             } catch {
                 print(error)
             }

@@ -5,7 +5,7 @@ struct Library: Codable, Identifiable {
         case id = "Id"
         case name = "Name"
         case childCount = "ChildCount"
-        case items = "items"
+        case items = "Items"
 //        case itemType = "ItemType"
     }
     var name: String

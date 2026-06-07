@@ -30,31 +30,36 @@ struct MultiItemHero: View {
                 HStack {
                     ForEach(Array(items.enumerated()), id: \.offset) {
                         idx, item in
-                        
-                        VStack(alignment: .leading) {
-                            if (item.tag) != nil {
-                                Text(item.tag!).font(.caption).padding(4.0)
-                                    .background(Color.green).clipShape(
-                                        .buttonBorder
-                                    )
+                        let backdropBlur = item.imageBlurhashes?.backdrop.values.first
+                        ZStack {
+                            if (backdropBlur != nil) {
+                                Image(uiImage: UIImage(blurHash: backdropBlur!, size: CGSize.init(width: 400, height: 400))!)
                             }
-                            Text(item.title).font(.largeTitle).bold()
-                            if (item.subtitle) != nil {
-                                Text(item.subtitle!).font(.callout).lineLimit(2)
-                                    .truncationMode(.tail)
-                            }
-
-                            if (item.description) != nil {
-                                Text(item.description!).font(.callout)
-                                    .lineLimit(2).truncationMode(.tail)
-                            }
-                            HStack {
-                                NavigationLink {
-//                                    MediaView(id: "3")
-                                    NowPlayingPage(item: item)
-                                } label: {
-                                    Label("Watch Now", systemImage: "play")
-                                }.buttonStyle(.glass)
+                            VStack(alignment: .leading) {
+                                if (item.tag) != nil {
+                                    Text(item.tag!).font(.caption).padding(4.0)
+                                        .background(Color.green).clipShape(
+                                            .buttonBorder
+                                        )
+                                }
+                                Text(item.title).font(.largeTitle).bold()
+                                if (item.subtitle) != nil {
+                                    Text(item.subtitle!).font(.callout).lineLimit(2)
+                                        .truncationMode(.tail)
+                                }
+                                
+                                if (item.description) != nil {
+                                    Text(item.description!).font(.callout)
+                                        .lineLimit(2).truncationMode(.tail)
+                                }
+                                HStack {
+                                    NavigationLink {
+                                        //                                    MediaView(id: "3")
+                                        NowPlayingPage(item: item)
+                                    } label: {
+                                        Label("Watch Now", systemImage: "play")
+                                    }.buttonStyle(.glass)
+                                }
                             }
                         }.frame(height: 200.0)
                             .containerRelativeFrame(.horizontal) {
@@ -63,12 +68,12 @@ struct MultiItemHero: View {
                             size * 0.8
 
                         }
-                            .background(
-                                Gradient(colors: [randomColor(), randomColor()])
-                                    .opacity(
-                                        0.6
-                                    )
-                            )
+//                            .background(
+//                                Gradient(colors: [randomColor(), randomColor()])
+//                                    .opacity(
+//                                        0.6
+//                                    )
+//                            )
 
 
                     }

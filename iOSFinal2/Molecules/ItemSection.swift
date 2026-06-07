@@ -14,28 +14,29 @@ struct ItemSection: View {
             Text(heading).font(.title2)
             ScrollView(.horizontal, showsIndicators: true) {
                 HStack {
-
                     ForEach(items) {
                         item in
-                        NavigationLink(value: item) {
-                            ZStack {
-                                Text(item.name)
+                        Group {
+                            NavigationLink(value: item) {
+                                ZStack {
+                                    Text(item.name)
+                                }
+                                .frame(width: 100.0, height: 100.0)
+                                .background(
+                                    Gradient(colors: [.teal, .cyan, .green]).opacity(
+                                        0.6
+                                    )
+                                ).cornerRadius(2.5)
+                                
                             }
-                            .frame(width: 100.0, height: 100.0)
-                            .background(
-                                Gradient(colors: [.teal, .cyan, .green]).opacity(
-                                    0.6
-                                )
-                            ).cornerRadius(2.5)
                             
                         }
-                        .navigationDestination(for: MediaItem.self) { item in
-                            MediaView(id: "2")
-                        }
+                        
                     }
                 }
             }
         }
+        
         .padding()
     }
 

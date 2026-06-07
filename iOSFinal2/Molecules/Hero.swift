@@ -11,26 +11,29 @@ struct Hero: View {
     var title: String
     var subtitle: String?
     var description: String?
-    var backgroundImage: Image?
+    var backgroundImage: URL?
+    var blurHash: String?
 
     var body: some View {
-        VStack(alignment: .leading) {
-            if ((tag) != nil) {Text(tag!).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)}
-            Text(title).font(.largeTitle).bold()
-            if ((subtitle) != nil) {Text(subtitle!).font(.callout).lineLimit(2).truncationMode(.tail)}
-
-            if ((description) != nil) {Text(description!).font(.callout).lineLimit(2).truncationMode(.tail)}
-
-        }.frame(maxWidth: .infinity)
-            .frame(height: 200.0)
-            .padding()
-            .background(
-                Gradient(colors: [.teal, .cyan, .white]).opacity(
-                    0.6
-                )
-            )
+        ZStack {
+            if (blurHash != nil) {
+                Image(uiImage: UIImage(blurHash: blurHash!, size: CGSize.init(width: 400, height: 400))!)
+            }
+            VStack(alignment: .leading) {
+                if ((tag) != nil) {Text(tag!).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)}
+                Text(title).font(.largeTitle).bold()
+                if ((subtitle) != nil) {Text(subtitle!).font(.callout).lineLimit(2).truncationMode(.tail)}
+                
+                if ((description) != nil) {Text(description!).font(.callout).lineLimit(2).truncationMode(.tail)}
+                
+            }.frame(maxWidth: .infinity)
+                .frame(height: 200.0)
+                .padding()
+                .foregroundStyle(.white)
+        }
     }
 }
 #Preview {
-    Hero(tag: "Continue Watching", title: "House (2006)", subtitle: "S1E1: Pilot - 46m", description: "some long long long long long goln text some long long long long long goln text some long long long long long goln text some long long long long long goln text ")
+    
+    Hero(tag: "", title: "House (2006)", subtitle: "S1E1: Pilot - 46m", description: "some long long long long long goln text some long long long long long goln text some long long long long long goln text some long long long long long goln text ", backgroundImage: nil, blurHash: "W5A0zW-p4V%NDiIW4}NdtTxbNFxwSii^NIR%M_x]~Vt1%0V?a^D%")
 }
