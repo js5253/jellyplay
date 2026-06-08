@@ -23,8 +23,8 @@ struct RootLoggedInView: View {
                 Tab("Search", systemImage: "gear", value: .search) {
                     SearchPage()
                 }
-                Tab("Watchlist", systemImage: "bookmark", value: .watchlist) {
-                    WatchlistPage()
+                Tab("Libraries", systemImage: "bookmark", value: .watchlist) {
+                    LibraryView()
                 }
                 Tab("Settings", systemImage: "magnifyingglass", value: .settings) {
                     SettingsPage()
@@ -55,6 +55,7 @@ struct ContentView: View {
                 }
             }
         }
+        .background(.background)
     }
 }
     

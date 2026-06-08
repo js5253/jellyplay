@@ -95,11 +95,10 @@ final class JellyfinService: ObservableObject {
 
             let decoded = try JSONDecoder().decode(LibraryResponse.self, from: data)
             let libraries = decoded.items
-            for library in decoded.items {
-                let content = try await getLibrary(parentId: library.id);
 
-            }
-            return decoded.items
+            return decoded.items.filter({collection in
+                collection.name != "Playlists"
+            })
 
         } catch  {
             throw error
@@ -125,6 +124,56 @@ final class JellyfinService: ObservableObject {
             let decoded = try JSONDecoder().decode(JellyfinMediaItem.self, from: data)
             
             return MediaItem(from: decoded)
+
+        } catch  {
+            print(error)
+        }
+        throw AppErrors.invalid
+
+
+    }
+    func getSeasons(id: String) async throws -> [MediaItem] {
+        do {
+            if (serverAddress == nil || userId == nil) {throw AppErrors.notAuthenticatedError}
+
+            let req = try prepareAuthedRequest(apiSuffix: "/Shows/\(id)/Seasons?userId=\(userId!)&Fields=ItemCounts,PrimaryImageAspectRatio,CanDelete,MediaSourceCount", httpMethod: "GET")
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            
+            return decoded.items.map({item in
+                MediaItem(from: item)
+            })
+
+        } catch  {
+            print(error)
+        }
+        throw AppErrors.invalid
+
+
+    }
+    func getEpisodes(showId: String, seasonId: String) async throws -> [MediaItem] {
+        do {
+            if (serverAddress == nil || userId == nil) {throw AppErrors.notAuthenticatedError}
+
+            let req = try prepareAuthedRequest(apiSuffix: "/Shows/\(showId)/Episodes?seasonId=\(seasonId)&userId=\(userId!)&Fields=ItemCounts,PrimaryImageAspectRatio,CanDelete,MediaSourceCount,Overview", httpMethod: "GET")
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppErrors.notAuthenticatedError
+            }
+            if let textContent = String(data: data, encoding: .utf8) { // for debugging use
+                print(textContent)
+            }
+
+            let decoded = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            
+            return decoded.items.map({ item in MediaItem(from: item) })
 
         } catch  {
             print(error)

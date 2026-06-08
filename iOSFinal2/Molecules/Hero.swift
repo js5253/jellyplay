@@ -7,33 +7,58 @@
 import SwiftUI
 
 struct Hero: View {
+    var item: MediaItem
     var tag: String?
-    var title: String
-    var subtitle: String?
-    var description: String?
-    var backgroundImage: URL?
-    var blurHash: String?
-
+    
     var body: some View {
         ZStack {
-            if (blurHash != nil) {
-                Image(uiImage: UIImage(blurHash: blurHash!, size: CGSize.init(width: 400, height: 400))!)
+            if ( item.imageBlurhashes?.backdrop.first != nil) {
+                var blurhash = item.imageBlurhashes?.backdrop.first
+                Image(uiImage: UIImage(blurHash: blurhash!.value, size: CGSize.init(width: 400, height: 200))!)
+                    .clipped()
+            } else {
+                VStack {
+                    
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                    .background(Color.black)
             }
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 20) {
                 if ((tag) != nil) {Text(tag!).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)}
-                Text(title).font(.largeTitle).bold()
-                if ((subtitle) != nil) {Text(subtitle!).font(.callout).lineLimit(2).truncationMode(.tail)}
+                if (item.parentName != nil) {
+                    Text(item.parentName!).font(.largeTitle).bold()
+                    Text(item.name).font(.callout).lineLimit(2).truncationMode(.tail)
+
+                } else {
+                    Text(item.name).font(.largeTitle).lineLimit(2).truncationMode(.tail)
+                }
                 
-                if ((description) != nil) {Text(description!).font(.callout).lineLimit(2).truncationMode(.tail)}
-                
-            }.frame(maxWidth: .infinity)
-                .frame(height: 200.0)
+                if ((item.tagline) != nil) {Text(item.tagline!).font(.callout).lineLimit(2).truncationMode(.tail).bold()}
+                NavigationLink {
+                    NowPlayingPage(item: item)
+                } label: {
+                    Label("Watch Now", systemImage: "play")
+                        .buttonStyle(.glassProminent)
+                }.buttonStyle(.glassProminent)
+                VStack(alignment: .trailing) {
+                    if (item.userData?.playedPercentage != nil) {
+                        VStack(alignment: .trailing) {
+                            ProgressView(value: (item.userData?.playedPercentage!)! / 100).progressViewStyle(.linear)
+                                .frame(maxWidth: .infinity)
+                                .accentColor(.gray)
+                        }
+                        Text("\((item.userData?.playedPercentage)!)% Watched").font(.caption2).foregroundStyle(.gray)
+                    }
+                }
+            }.frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
                 .foregroundStyle(.white)
         }
+        .frame(height: 250.0)
     }
 }
 #Preview {
     
-    Hero(tag: "", title: "House (2006)", subtitle: "S1E1: Pilot - 46m", description: "some long long long long long goln text some long long long long long goln text some long long long long long goln text some long long long long long goln text ", backgroundImage: nil, blurHash: "W5A0zW-p4V%NDiIW4}NdtTxbNFxwSii^NIR%M_x]~Vt1%0V?a^D%")
+    Hero(item: MediaItem(name: "ASSASASA", itemType: .Series, id: "SASAASASSA"))
 }

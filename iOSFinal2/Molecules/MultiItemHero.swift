@@ -18,15 +18,6 @@ struct MultiItemHero: View {
     ).autoconnect()
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            ZStack {
-                HStack(alignment: .bottom) {
-                    ForEach(items) {
-                        _ in
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 16, height: 16)
-                    }
-                }.frame(height: 200.0)
                 HStack {
                     ForEach(Array(items.enumerated()), id: \.offset) {
                         idx, item in
@@ -36,25 +27,21 @@ struct MultiItemHero: View {
                                 Image(uiImage: UIImage(blurHash: backdropBlur!, size: CGSize.init(width: 400, height: 400))!)
                             }
                             VStack(alignment: .leading) {
-                                if (item.tag) != nil {
-                                    Text(item.tag!).font(.caption).padding(4.0)
-                                        .background(Color.green).clipShape(
-                                            .buttonBorder
-                                        )
+                                if (item.parentName != nil) {
+                                    VStack {
+                                        Text(item.parentName!).font(.largeTitle).bold()
+                                        Text(item.name).font(.title3)
+                                    }
+                                } else {
+                                    Text(item.name).font(.largeTitle).bold()
                                 }
-                                Text(item.title).font(.largeTitle).bold()
-                                if (item.subtitle) != nil {
-                                    Text(item.subtitle!).font(.callout).lineLimit(2)
-                                        .truncationMode(.tail)
-                                }
-                                
-                                if (item.description) != nil {
-                                    Text(item.description!).font(.callout)
+
+                                if (item.tagline) != nil {
+                                    Text(item.tagline!).font(.callout)
                                         .lineLimit(2).truncationMode(.tail)
                                 }
                                 HStack {
                                     NavigationLink {
-                                        //                                    MediaView(id: "3")
                                         NowPlayingPage(item: item)
                                     } label: {
                                         Label("Watch Now", systemImage: "play")
@@ -78,7 +65,6 @@ struct MultiItemHero: View {
 
                     }
                 }
-            }
 
         }
         .scrollTargetBehavior(.viewAligned)
@@ -102,7 +88,7 @@ struct MultiItemHero: View {
 #Preview {
     MultiItemHero(items: [
         MediaItem(name: "The Bee Movie", itemType: MediaType.Movie, id: "1"),
-        MediaItem(name: "The LEGO Movie", itemType: .Movie, id: "2"),
+        MediaItem(name: "The LEGO Movie", itemType: .Series, id: "2"),
         MediaItem(name: "The Emoji Movie", itemType: .Movie, id: "3"),
         MediaItem(name: "CATS: The Movie", itemType: .Movie, id: "4"),
         MediaItem(name: "Love on a Leash", itemType: .Movie, id: "5"),

@@ -40,6 +40,10 @@ struct NowPlayingPage: View {
                         let url = try await JellyfinService.shared.getPlaybackUrl(itemId: item.id)// URL to local or remote media.
                         print(url)
                         player = AVPlayer(url: url)
+                        player?.addPeriodicTimeObserver(forInterval: .init(seconds: 5.0, preferredTimescale: 1), queue: .global(), using: {time in
+                            print("Reporting Item Progress: \(time)")
+                            // do something here
+                        })
 
                     } catch {
                         print("ERROR ;-;")
@@ -47,9 +51,11 @@ struct NowPlayingPage: View {
                 }
             }
         .background(Color.black)
+        .navigationTitle("\(item.name) - \(item.parentName)")
+        .navigationBarTitleDisplayMode(.inline) // Forces a small, centered title
 //        }
     }
 }
 #Preview {
-//    NowPlayingPage()
+    NowPlayingPage(item: MediaItem(name: "Madoka Magica", itemType: .Series, id: "SASASASA"))
 }

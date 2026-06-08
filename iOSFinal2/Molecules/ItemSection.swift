@@ -17,18 +17,11 @@ struct ItemSection: View {
                     ForEach(items) {
                         item in
                         Group {
-                            NavigationLink(value: item) {
-                                ZStack {
-                                    Text(item.name)
-                                }
-                                .frame(width: 100.0, height: 100.0)
-                                .background(
-                                    Gradient(colors: [.teal, .cyan, .green]).opacity(
-                                        0.6
-                                    )
-                                ).cornerRadius(2.5)
-                                
+                            NavigationLink(destination: MediaView(id: item.id)) {
+                                ItemButton(name: item.name)
                             }
+//                                                EmptyView()
+//                            }
                             
                         }
                         

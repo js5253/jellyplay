@@ -85,7 +85,7 @@ struct LoginPage: View {
                         .textInputAutocapitalization(.never)
                         .textFieldStyle(.roundedBorder)
                     
-                }.background(Color.gray)
+            }.background(.background)
         }
     }
 }

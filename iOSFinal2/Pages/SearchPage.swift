@@ -9,7 +9,7 @@ import SwiftUI
 struct SearchPage: View {
     @State() var searchText: String = ""
     @State() var items: [MediaItem] = []
-    @State private var selectedLibrary: Season = .one
+    @State private var selectedLibrary: String?
     @State private var libraries: [Library] = [];
     var recentSearches:  [RecentSearch] = []
 
@@ -41,7 +41,7 @@ struct SearchPage: View {
                         NavigationLink {
                             MediaView(id: media.id)
                         } label: {
-                            SearchRow(title: media.title, subtitle: media.subtitle)
+                            SearchRow(title: media.name, subtitle: media.parentName)
                         }
                     }
                 }
@@ -65,7 +65,7 @@ struct SearchPage: View {
                 libraries = try await JellyfinService.shared.getLibraries()
                 print(libraries)
             } catch {
-                print("error")
+                ErrorService.shared.handleError(description: error)
             }
 
         }
