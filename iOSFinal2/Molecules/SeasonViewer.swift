@@ -48,12 +48,14 @@ struct SeasonViewer: View {
                 })
             }
         }
-        .task {
-            do {
-                seasons = try await JellyfinService.shared.getSeasons(id: item.id)
-                selectedSeason = seasons?.first?.id
-            } catch {
-                ErrorService.shared.handleError(description: error)
+        .onAppear {
+            Task {
+                do {
+                    seasons = try await JellyfinService.shared.getSeasons(id: item.id)
+                    selectedSeason = seasons?.first?.id
+                } catch {
+                    ErrorService.shared.handleError(description: error)
+                }
             }
         }
     }

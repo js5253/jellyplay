@@ -10,9 +10,33 @@
 		82A3BA6D2FBCEE1B008B9E54 /* iOSFinal2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSFinal2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8271C73A2FD77AA70067A8C6 /* Exceptions for "iOSFinal2" folder in "iOSFinal2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Lib/CSharpTicks.swift,
+			);
+			target = 82A3BA6C2FBCEE1B008B9E54 /* iOSFinal2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		8271C73B2FD77AA70067A8C6 /* Exceptions for "iOSFinal2" folder in "Copy Bundle Resources" phase from "iOSFinal2" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 82A3BA6B2FBCEE1B008B9E54 /* Resources */;
+			membershipExceptions = (
+				Lib/CSharpTicks.swift,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		82A3BA6F2FBCEE1B008B9E54 /* iOSFinal2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8271C73A2FD77AA70067A8C6 /* Exceptions for "iOSFinal2" folder in "iOSFinal2" target */,
+				8271C73B2FD77AA70067A8C6 /* Exceptions for "iOSFinal2" folder in "Copy Bundle Resources" phase from "iOSFinal2" target */,
+			);
 			path = iOSFinal2;
 			sourceTree = "<group>";
 		};

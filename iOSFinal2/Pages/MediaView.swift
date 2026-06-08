@@ -24,6 +24,15 @@ struct MediaView: View {
                             if (item!.description != nil) {
                                 Text(item!.description!)
                             }
+                            if ((item?.itemType == .Episode || item!.itemType == .Season) && item?.seriesId != nil) {
+                                NavigationLink {
+                                    MediaView(id: item!.seriesId!)
+                                } label: {
+                                    Label("View Series", systemImage: "play")
+                                        .buttonStyle(.glassProminent)
+                                }.buttonStyle(.glassProminent)
+
+                            }
 
                             if (item!.itemType == .Series) {
                                 SeasonViewer(item: item!)

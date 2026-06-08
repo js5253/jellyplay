@@ -12,7 +12,7 @@ struct SettingsPage: View {
             Text("Settings").font(.largeTitle)
             List {
                 Section(JellyfinService.shared.serverBase() ?? "") {
-                    Button("Log Out", role: .destructive, action: {})
+                    Button("Log Out", role: .destructive, action: JellyfinService.shared.signOut)
                 }
             }
         }

@@ -35,20 +35,28 @@ struct Hero: View {
                 }
                 
                 if ((item.tagline) != nil) {Text(item.tagline!).font(.callout).lineLimit(2).truncationMode(.tail).bold()}
+                if (item.itemType == .Movie || item.itemType == .Episode || item.itemType == .Video) {
                 NavigationLink {
                     NowPlayingPage(item: item)
                 } label: {
                     Label("Watch Now", systemImage: "play")
                         .buttonStyle(.glassProminent)
                 }.buttonStyle(.glassProminent)
-                VStack(alignment: .trailing) {
-                    if (item.userData?.playedPercentage != nil) {
-                        VStack(alignment: .trailing) {
-                            ProgressView(value: (item.userData?.playedPercentage!)! / 100).progressViewStyle(.linear)
-                                .frame(maxWidth: .infinity)
-                                .accentColor(.gray)
+                    VStack(alignment: .trailing) {
+                        if ((item.itemType == .Episode || item.itemType == .Video || item.itemType == .Movie) && item.userData?.playedPercentage != nil) {
+                            VStack(alignment: .trailing) {
+                                ProgressView(value: (item.userData?.playedPercentage!)! / 100).progressViewStyle(.linear)
+                                    .frame(maxWidth: .infinity)
+                                    .accentColor(.gray)
+                            }
+                            HStack {
+                                if (item.itemType == .Video || item.itemType == .Movie || item.itemType == .Episode && item.runtimeTicks != nil) {
+
+                                }
+                                Text("\((item.userData?.playedPercentage)!)% Watched")
+                            }
+                            .font(.caption2).foregroundStyle(.gray)
                         }
-                        Text("\((item.userData?.playedPercentage)!)% Watched").font(.caption2).foregroundStyle(.gray)
                     }
                 }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)

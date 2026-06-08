@@ -25,7 +25,8 @@ struct MediaItem: Identifiable, Hashable, Codable {
     let tagline: String?
     let imageBlurhashes: ImageBlurhashes?
     var userData: UserData?
-
+    var seriesId: String?
+    
     init(from: JellyfinMediaItem) {
         self.name = from.name
         self.itemType = from.mediaType
@@ -37,6 +38,7 @@ struct MediaItem: Identifiable, Hashable, Codable {
         self.indexNumber = from.indexNumber
         self.parentIndexNumber = from.parentIndexNumber
         self.userData = from.userData
+        self.seriesId = from.seriesId
 
     }
     // this should only be used for testing.
@@ -84,10 +86,12 @@ struct JellyfinMediaItem: Codable {
         case indexNumber = "IndexNumber"
         case parentIndexNumber = "ParentIndexNumber"
         case userData = "UserData"
+        case seriesId = "SeriesId"
     }
     var userData: UserData?
     var name: String
     var id: String
+    var seriesId: String?
     var seriesName: String?
     var indexNumber: Int?
     var parentIndexNumber: Int?

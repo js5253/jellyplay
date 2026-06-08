@@ -199,8 +199,10 @@ final class JellyfinService: ObservableObject {
     }
     
     func getLibrary(parentId: String) async throws -> [MediaItem] {
+        if (serverAddress == nil || userId == nil) {throw AppErrors.notAuthenticatedError}
+
         do {
-            let req = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Latest?ParentId=\(parentId)", httpMethod: "GET")
+            let req = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Latest?Limit=16&Fields=PrimaryImageAspectRatio,Path&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&ParentId=\(parentId)", httpMethod: "GET")
             
             let (data, response) = try await URLSession.shared.data(for: req)
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -374,6 +376,12 @@ final class JellyfinService: ObservableObject {
         let serverAddress = UserDefaults().string(forKey: "serverAddress") ?? "";
 
         return serverAddress
+    }
+    func signOut() {
+        if let bundleID = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleID)
+        }
+        fatalError()
     }
     
 }

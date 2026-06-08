@@ -8,16 +8,18 @@ import SwiftUI
 struct SearchRow : View {
     var title: String
     var subtitle: String?
+    var mediaType: MediaType
     var body: some View {
         VStack {
             Text(title)
             if (subtitle != nil) {
                 Text(subtitle!).font(.caption)
             }
+            Text(mediaType.rawValue)
         }.padding()
 
     }
 }
 #Preview {
-    SearchRow(title: "House M. D. (2006)", subtitle: "TV - Watchlisted")
+    SearchRow(title: "House M. D. (2006)", subtitle: "TV - Watchlisted", mediaType: .Episode)
 }
