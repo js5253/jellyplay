@@ -49,12 +49,7 @@ struct Hero: View {
                                     .frame(maxWidth: .infinity)
                                     .accentColor(.gray)
                             }
-                            HStack {
-                                if (item.itemType == .Video || item.itemType == .Movie || item.itemType == .Episode && item.runtimeTicks != nil) {
 
-                                }
-                                Text("\((item.userData?.playedPercentage)!)% Watched")
-                            }
                             .font(.caption2).foregroundStyle(.gray)
                         }
                     }

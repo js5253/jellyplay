@@ -37,7 +37,7 @@ struct RootLoggedInView: View {
 
 struct ContentView: View {
 //    @State var currentView: RootNavigationDestination;
-//    @EnvironmentObject var jellyfinService: JellyfinService
+    @EnvironmentObject var jellyfinService: JellyfinService
     var body: some View {
         Group {
             switch(JellyfinService.shared.isLoading) {

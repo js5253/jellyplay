@@ -14,7 +14,7 @@ struct iOSFinal2App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-//                .environmentObject(jellyfinService)
+                .environmentObject(jellyfinService)
 
         }
     }
