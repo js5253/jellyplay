@@ -58,16 +58,16 @@ final class JellyfinService: ObservableObject {
         
     }
     private func getAuthHeader() throws -> String {
-        if (!isLoggedIn) {
-            throw AppErrors.notAuthenticatedError
-        }
-        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId! + "\", Token=\"" + accessToken! + "\", Version=\"0.0.1\""
+        guard let userId else {throw AppErrors.notAuthenticatedError}
+        guard let deviceId else {throw AppErrors.notAuthenticatedError}
+        guard let accessToken else {throw AppErrors.notAuthenticatedError}
+        return "MediaBrowser Client=\"JellyPlay\", Device=\"iOS\", DeviceId=\"" + deviceId + "\", Token=\"" + accessToken + "\", Version=\"0.0.1\""
 
     }
     private func prepareAuthedRequest(apiSuffix: String, httpMethod: String) throws -> URLRequest {
+        guard let serverAddress else {throw AppErrors.notAuthenticatedError}
         do {
-            if (serverAddress == nil) {throw AppErrors.notAuthenticatedError}
-            let completeUrl = serverAddress! + apiSuffix
+            let completeUrl = serverAddress + apiSuffix
             let url = URL(string: completeUrl)!
             var request = URLRequest(url: url)
             request.httpMethod = httpMethod
@@ -75,7 +75,7 @@ final class JellyfinService: ObservableObject {
             request.setValue(try getAuthHeader(), forHTTPHeaderField: "Authorization")
             
             
-            return request;
+            return request
         } catch {
             throw error
         }
@@ -204,16 +204,15 @@ final class JellyfinService: ObservableObject {
             let req = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Latest?Limit=16&Fields=PrimaryImageAspectRatio,Path&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&ParentId=\(parentId)", httpMethod: "GET")
             
             let (data, response) = try await URLSession.shared.data(for: req)
-            guard let httpResponse = response as? HTTPURLResponse else {
+            guard response is HTTPURLResponse else {
                 throw AppErrors.notAuthenticatedError
             }
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
-                print(textContent)
             }
 
-            let decoded = try JSONDecoder().decode([MediaItem].self, from: data)
-            
-            return decoded
+            let decoded = try JSONDecoder().decode([Throwable<MediaItem>].self, from: data)
+            let items = decoded.compactMap {$0.value}
+            return items
 
         } catch  {
             print(error)
@@ -223,9 +222,9 @@ final class JellyfinService: ObservableObject {
     }
     
     func getContinueWatching() async throws -> [MediaItem] {
+        guard let userId else {throw AppErrors.notAuthenticatedError}
         do {
-            if (userId == nil) {throw AppErrors.notAuthenticatedError}
-            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
+            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId)/Items/Resume?Limit=12&Recursive=true&Fields=PrimaryImageAspectRatio&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Thumb&EnableTotalRecordCount=false&MediaTypes=Video", httpMethod: "GET")
 
             let (data, _) = try await URLSession.shared.data(for: request)
             let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
@@ -243,14 +242,14 @@ final class JellyfinService: ObservableObject {
         
     }
     func makeWatchlist() async throws {
+        guard let userId else {throw AppErrors.notAuthenticatedError}
         do {
-            if (userId == nil) {throw AppErrors.notAuthenticatedError}
             var request = try prepareAuthedRequest(apiSuffix: "/Playlists", httpMethod: "POST")
             let parameters: [String: Any] = [
                 "Name": "Watchlist",
                 "IsPublic": false,
                 "Ids": [],
-                "UserId": userId!
+                "UserId": userId
             ]
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters);
             let (data, req) = try await URLSession.shared.data(for: request)
@@ -265,9 +264,9 @@ final class JellyfinService: ObservableObject {
 
     }
     func getWatchlist() async throws {
+        guard let userId else {throw AppErrors.notAuthenticatedError}
         do {
-            if (userId == nil) {throw AppErrors.notAuthenticatedError}
-            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId!)/Items?StartIndex=0&Limit=10&Fields=PrimaryImageAspectRatio%2CSortName%2CPath%2CChildCount%2CMediaSourceCount%2CPrimaryImageAspectRatio&ImageTypeLimit=1&SortBy=IsFolder%2CSortName&SortOrder=Ascending", httpMethod: "GET")
+            let request = try prepareAuthedRequest(apiSuffix: "/Users/\(userId)/Items?StartIndex=0&Limit=10&Fields=PrimaryImageAspectRatio%2CSortName%2CPath%2CChildCount%2CMediaSourceCount%2CPrimaryImageAspectRatio&ImageTypeLimit=1&SortBy=IsFolder%2CSortName&SortOrder=Ascending", httpMethod: "GET")
 
             let (data, _) = try await URLSession.shared.data(for: request)
             let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
@@ -279,15 +278,15 @@ final class JellyfinService: ObservableObject {
 
     }
     func getNextUp() async throws -> [MediaItem] {
-        
+        guard let userId else {throw AppErrors.notAuthenticatedError}
         do {
-            if (userId == nil) {throw AppErrors.notAuthenticatedError}
-            let request = try prepareAuthedRequest(apiSuffix: "/Shows/NextUp?Limit=24&Fields=PrimaryImageAspectRatio,DateCreated,Path,MediaSourceCount&UserId=\(userId!)&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Banner,Thumb&EnableTotalRecordCount=false&DisableFirstEpisode=false&NextUpDateCutoff=2025-06-06T23:05:38.257Z&EnableResumable=false&EnableRewatching=false", httpMethod: "GET")
+            let request = try prepareAuthedRequest(apiSuffix: "/Shows/NextUp?Limit=24&Fields=PrimaryImageAspectRatio,DateCreated,Path,MediaSourceCount&UserId=\(userId)&ImageTypeLimit=1&EnableImageTypes=Primary,Backdrop,Banner,Thumb&EnableTotalRecordCount=false&DisableFirstEpisode=false&NextUpDateCutoff=2025-06-06T23:05:38.257Z&EnableResumable=false&EnableRewatching=false", httpMethod: "GET")
 
             let (data, _) = try await URLSession.shared.data(for: request)
-            let response = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+            let decoded = try JSONDecoder().decode(JellyfinItemResponse.self, from: data)
+
             
-            return response.items.map({item in
+            return decoded.items.map({item in
                 MediaItem(from: item)
             }
             )

@@ -12,10 +12,12 @@ struct Hero: View {
     
     var body: some View {
         ZStack {
-            if ( item.imageBlurhashes?.backdrop.first != nil) {
-                var blurhash = item.imageBlurhashes?.backdrop.first
-                Image(uiImage: UIImage(blurHash: blurhash!.value, size: CGSize.init(width: 400, height: 200))!)
+            let blurhash: String? = nil
+//            let blurhash = item.imageBlurhashes["Primary"]?.enumerated().first
+            if let blurhash = blurhash {
+                Image(uiImage: UIImage(blurHash: blurhash, size: CGSize.init(width: 400, height: 200))!)
                     .clipped()
+                Text("Blurhash Item")
             } else {
                 VStack {
                     
@@ -25,16 +27,18 @@ struct Hero: View {
                     .background(Color.black)
             }
             VStack(alignment: .leading, spacing: 20) {
-                if ((tag) != nil) {Text(tag!).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)}
-                if (item.parentName != nil) {
-                    Text(item.parentName!).font(.largeTitle).bold()
+                if let tagline = item.tagline { Text(tagline).font(.caption).padding(6.0).background(Color.green).clipShape(.buttonBorder)
+                }
+                if let parentName = item.parentName {
+                    Text(parentName).font(.largeTitle).bold()
                     Text(item.name).font(.callout).lineLimit(2).truncationMode(.tail)
-
                 } else {
                     Text(item.name).font(.largeTitle).lineLimit(2).truncationMode(.tail)
                 }
                 
-                if ((item.tagline) != nil) {Text(item.tagline!).font(.callout).lineLimit(2).truncationMode(.tail).bold()}
+//                if let tagline = item.tagline {
+//                    Text(tagline).font(.callout).lineLimit(2).truncationMode(.tail).bold()
+//                }
                 if (item.itemType == .Movie || item.itemType == .Episode || item.itemType == .Video) {
                 NavigationLink {
                     NowPlayingPage(item: item)
@@ -43,15 +47,19 @@ struct Hero: View {
                         .buttonStyle(.glassProminent)
                 }.buttonStyle(.glassProminent)
                     VStack(alignment: .trailing) {
-                        if ((item.itemType == .Episode || item.itemType == .Video || item.itemType == .Movie) && item.userData?.playedPercentage != nil) {
-                            VStack(alignment: .trailing) {
-                                ProgressView(value: (item.userData?.playedPercentage!)! / 100).progressViewStyle(.linear)
-                                    .frame(maxWidth: .infinity)
-                                    .accentColor(.gray)
+                        if (item.itemType == .Episode || item.itemType == .Video || item.itemType == .Movie) {
+                            if let playedPercentage = item.userData?.playedPercentage {
+                                VStack(alignment: .trailing) {
+                                    ProgressView(value: playedPercentage / 100).progressViewStyle(.linear)
+                                        .frame(maxWidth: .infinity)
+                                        .accentColor(.gray)
+                                }
+                                
+                                .font(.caption2).foregroundStyle(.gray)
+                                
                             }
-
-                            .font(.caption2).foregroundStyle(.gray)
                         }
+                            
                     }
                 }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)

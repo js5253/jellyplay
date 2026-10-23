@@ -22,24 +22,26 @@ struct MultiItemHero: View {
                 HStack {
                     ForEach(Array(items.enumerated()), id: \.offset) {
                         idx, item in
-                        let backdropBlur = item.imageBlurhashes?.backdrop.values.first
+                        let backdropBlur: String? = nil; //item.imageBlurhashes.backdrop.values.first
                         ZStack {
-                            if (backdropBlur != nil) {
-                                Image(uiImage: UIImage(blurHash: backdropBlur!, size: CGSize.init(width: 400, height: 400))!)
+                            if let backdropBlur {
+                                Image(uiImage: UIImage(blurHash: backdropBlur, size: CGSize.init(width: 400, height: 400))!)
+
                             }
                             VStack(alignment: .leading) {
-                                if (item.parentName != nil) {
+                                if let parentName = item.parentName {
                                     VStack {
                                         Text(item.parentName!).font(.largeTitle).bold()
                                         Text(item.name).font(.title3)
                                     }
                                 } else {
                                     Text(item.name).font(.largeTitle).bold()
-                                }
 
-                                if (item.tagline) != nil {
+                                }
+                                if let tagline = item.tagline {
                                     Text(item.tagline!).font(.callout)
                                         .lineLimit(2).truncationMode(.tail)
+
                                 }
                                 HStack {
                                     NavigationLink {
@@ -61,7 +63,8 @@ struct MultiItemHero: View {
                                         0.6
                                     )
                             )
-                            .clipShape(.rect(cornerRadius: 6))
+                            
+                            .glassEffect(in: RoundedRectangle(cornerRadius: 15, style: .continuous))
                             .padding(EdgeInsets.init(top: 0, leading: 24, bottom: 0, trailing: 6))
 
                     }

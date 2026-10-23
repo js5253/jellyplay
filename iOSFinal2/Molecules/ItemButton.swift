@@ -12,11 +12,19 @@ struct ItemButton: View {
             Text(name)
         }
         .frame(width: 100.0, height: 100.0)
+        .background(.ultraThinMaterial)
         .background(
+        
             Gradient(colors: [.teal, .cyan]).opacity(
                 0.6
             )
-        ).cornerRadius(2.5)
+        )
+
+            
 
     }
+}
+
+#Preview {
+    ItemButton(name: "Happy Feet 6")
 }

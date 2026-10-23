@@ -15,10 +15,9 @@ struct MediaView: View {
         Group {
             if (loading) {
                 ProgressView()
+            } else if (item == nil) {
+                Text("Item Not Found")
             } else {
-                if (item == nil) {
-                    Text("Item Not Found")
-                } else {
                     switch(item!.itemType) {
                     case MediaType.Movie:
                         MovieView(item: item!)
@@ -27,19 +26,19 @@ struct MediaView: View {
                     default:
                         Text(":/")
                     }
-                }
             }
         }
         .task {
             do {
                 item = try await JellyfinService.shared.getItem(id: id)
-                
-                if (item?.itemType == .Season) {
-                    // try to get the parent item here
-                        
-                } else if (item?.itemType == .Episode) {
+                print(item)
+//                if (item?.itemType == .Season) {
+//                    try to get the parent item here
+//                        
+//                }
+                if (item?.itemType == .Episode || item?.itemType == .Season) {
                     subId = item?.id
-                    item = try await JellyfinService.shared.getItem(id: item!.seriesId!)
+                    item = try await JellyfinService.shared.getItem(id: (item?.seriesId)!)
                 }
                 loading = false
             }

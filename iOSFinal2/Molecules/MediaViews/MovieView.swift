@@ -13,10 +13,10 @@ struct MovieView: View {
                 VStack {
                     Hero(item: item)
                     ScrollView {
-                        if (item.description != nil) {
+                        if let description = item.description {
                             Text(item.description!)
-                        }
-                        
+
+                        }                        
                         Text(String(item.itemType.rawValue)).font(.footnote).foregroundStyle(.gray)
                     }.padding()
                 }

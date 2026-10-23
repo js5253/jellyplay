@@ -16,25 +16,45 @@ struct HomePage: View {
     ///TODO: make this more modular
     @EnvironmentObject var jellyfinService: JellyfinService
     @State private var selectedTab: Tabs = .watchNow
-    @State private var libraries: [Library] = [];
-    @State private var continueWatching: [MediaItem] = [];
-    @State private var nextUp: [MediaItem] = [];
+    @State private var libraries: [Library] = [
+        
+    ]
+    ;
+    @State private var continueWatching: [MediaItem] = [
+        MediaItem(name: "AAAAA", itemType: MediaType.Movie, id: "ABC"),
+         MediaItem(name: "BCD", itemType: MediaType.Movie, id: "ABC"),
+         MediaItem(name: "DEF", itemType: MediaType.Movie, id: "ABC")
+
+    ];
+    @State private var nextUp: [MediaItem] = [
+        MediaItem(name: "AAAAA", itemType: MediaType.Movie, id: "ABC"),
+         MediaItem(name: "BCD", itemType: MediaType.Movie, id: "ABC"),
+         MediaItem(name: "DEF", itemType: MediaType.Movie, id: "ABC")
+        
+    ];
     @State private var latestItems: [MediaItem] = [];
     let rows = [GridItem(.fixed(30)), GridItem(.fixed(30))]
     var body: some View {
         VStack(alignment: .leading) {
             Text("Watch Now").font(.title).bold().padding()
             MultiItemHero(items:
-                continueWatching + nextUp
+                            [MediaItem(name: "AAAAA", itemType: MediaType.Movie, id: "ABC"),
+                             MediaItem(name: "BCD", itemType: MediaType.Movie, id: "ABC"),
+                             MediaItem(name: "DEF", itemType: MediaType.Movie, id: "ABC")
+                            ]
             )
             ScrollView {
-                if (!continueWatching.isEmpty) {
+                VStack {
+                    Text("View All Libraries").font(.headline)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .glassEffect()
+                .padding()
                     ItemSection(heading: "Continue Watching", items: continueWatching)
-                }
-                if (!nextUp.isEmpty) {
-                    
                     ItemSection(heading: "Next Up", items: nextUp)
-                }
+                DieView()
             }
         }.task {
             do {
@@ -45,7 +65,7 @@ struct HomePage: View {
                     try await latestItems += jellyfinService.getLibrary(parentId: library.id);
                 }
             } catch {
-                print(error)
+                print("ERROR ERROR ERROR")
             }
         }
     }

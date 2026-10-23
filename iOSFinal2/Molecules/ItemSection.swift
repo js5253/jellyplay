@@ -24,6 +24,8 @@ struct ItemSection: View {
 //                            }
                             
                         }
+                        .glassEffect()
+                        .clipped()
                         
                     }
                 }
