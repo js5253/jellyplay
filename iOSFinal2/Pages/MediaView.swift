@@ -9,6 +9,7 @@ import SwiftUI
 struct MediaView: View {
     var id: String
     @State private var item: MediaItem?
+    @State private var subId: String?
     @State private var loading = true
     var body: some View {
         Group {
@@ -18,27 +19,13 @@ struct MediaView: View {
                 if (item == nil) {
                     Text("Item Not Found")
                 } else {
-                    VStack {
-                        Hero(item: item!)
-                        ScrollView {
-                            if (item!.description != nil) {
-                                Text(item!.description!)
-                            }
-                            if ((item?.itemType == .Episode || item!.itemType == .Season) && item?.seriesId != nil) {
-                                NavigationLink {
-                                    MediaView(id: item!.seriesId!)
-                                } label: {
-                                    Label("View Series", systemImage: "play")
-                                        .buttonStyle(.glassProminent)
-                                }.buttonStyle(.glassProminent)
-
-                            }
-
-                            if (item!.itemType == .Series) {
-                                SeasonViewer(item: item!)
-                            }
-                            Text(String(item!.itemType.rawValue)).font(.footnote)
-                        }.padding()
+                    switch(item!.itemType) {
+                    case MediaType.Movie:
+                        MovieView(item: item!)
+                    case MediaType.Series, MediaType.Season, MediaType.Episode:
+                        SeriesView(item: item!, itemId: subId)
+                    default:
+                        Text(":/")
                     }
                 }
             }
@@ -46,6 +33,14 @@ struct MediaView: View {
         .task {
             do {
                 item = try await JellyfinService.shared.getItem(id: id)
+                
+                if (item?.itemType == .Season) {
+                    // try to get the parent item here
+                        
+                } else if (item?.itemType == .Episode) {
+                    subId = item?.id
+                    item = try await JellyfinService.shared.getItem(id: item!.seriesId!)
+                }
                 loading = false
             }
             catch {

@@ -6,10 +6,17 @@
 //
 import SwiftUI
 
+enum ValidateStatus {
+    case notValidated
+    case failed
+    case valid
+}
+
 struct LoginPage: View {
     @State var serverAddress: String = ""
     @State var serverUsername: String = ""
     @State var serverPassword: String = ""
+    @State var validateStatus: ValidateStatus = .notValidated
     @State var isCurrentlyCheckingServer: Bool = false
     
     var body: some View {
@@ -31,6 +38,15 @@ struct LoginPage: View {
                             )
                             .keyboardType(.URL)
                         }
+                        switch(validateStatus) {
+                        case .failed:
+                            Image(systemName: "heart.fill")
+                        case .notValidated:
+                            Image(systemName: "heart.outline")
+                        case .valid:
+                            Image(systemName: "heart.fill")
+
+                        }
                         Button(action: {
                             Task {
                                 isCurrentlyCheckingServer = true
@@ -45,10 +61,12 @@ struct LoginPage: View {
                                 isCurrentlyCheckingServer = false
                             }
                         }) {
+                            
                             Text("Validate Server")
                         }
                         .frame(maxWidth: CGFloat.infinity)
                         .buttonStyle(.bordered)
+                        .environment(\.colorScheme, .dark)
                         .padding()
                         HStack {
                             Text("Username")
@@ -79,13 +97,14 @@ struct LoginPage: View {
                     }
                 }
                         .frame(maxWidth: CGFloat.infinity)
-                        .padding()
-                        .background(Color.white)
+                        .padding(0)
+//                        .foregroundStyle(.white)
+//                        .background(Color.black)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                         .textFieldStyle(.roundedBorder)
                     
-            }.background(.background)
+            }
         }
     }
 }

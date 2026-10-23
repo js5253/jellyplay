@@ -14,6 +14,7 @@ enum Tabs: Equatable, Hashable, Identifiable {
 
 struct HomePage: View {
     ///TODO: make this more modular
+    @EnvironmentObject var jellyfinService: JellyfinService
     @State private var selectedTab: Tabs = .watchNow
     @State private var libraries: [Library] = [];
     @State private var continueWatching: [MediaItem] = [];
@@ -37,13 +38,12 @@ struct HomePage: View {
             }
         }.task {
             do {
-                libraries = try await JellyfinService.shared.getLibraries()
-                nextUp = try await JellyfinService.shared.getNextUp()
-                continueWatching = try await JellyfinService.shared.getContinueWatching()
+                libraries = try await jellyfinService.getLibraries()
+                nextUp = try await jellyfinService.getNextUp()
+                continueWatching = try await jellyfinService.getContinueWatching()
                 for library in libraries {
-                    try await latestItems += JellyfinService.shared.getLibrary(parentId: library.id);
+                    try await latestItems += jellyfinService.getLibrary(parentId: library.id);
                 }
-//                try await JellyfinService.shared.getWatchlist()
             } catch {
                 print(error)
             }

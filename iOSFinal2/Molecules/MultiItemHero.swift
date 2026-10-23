@@ -11,6 +11,7 @@ struct MultiItemHero: View {
     var items: [MediaItem]
     @State private var scrollPosition = ScrollPosition()
     @State private var x = 0
+    @State private var screenWidth = 0
     @State private var timer = Timer.publish(
         every: 5.0,
         on: .main,
@@ -53,15 +54,15 @@ struct MultiItemHero: View {
                             size,
                             axis in
                             size * 0.8
-
                         }
-//                            .background(
-//                                Gradient(colors: [randomColor(), randomColor()])
-//                                    .opacity(
-//                                        0.6
-//                                    )
-//                            )
-
+                            .background(
+                                Gradient(colors: [randomColor(), randomColor()])
+                                    .opacity(
+                                        0.6
+                                    )
+                            )
+                            .clipShape(.rect(cornerRadius: 6))
+                            .padding(EdgeInsets.init(top: 0, leading: 24, bottom: 0, trailing: 6))
 
                     }
                 }
@@ -80,8 +81,13 @@ struct MultiItemHero: View {
         }
         .onChange(of: x) {
             withAnimation {
-                scrollPosition.scrollTo(x: CGFloat(x * 290))
+                scrollPosition.scrollTo(x: CGFloat(x * screenWidth))
             }
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { newWidth in
+            self.screenWidth = Int(newWidth)
         }
     }
 }

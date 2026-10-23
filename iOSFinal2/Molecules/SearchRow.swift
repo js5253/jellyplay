@@ -10,12 +10,15 @@ struct SearchRow : View {
     var subtitle: String?
     var mediaType: MediaType
     var body: some View {
-        VStack {
-            Text(title)
-            if (subtitle != nil) {
-                Text(subtitle!).font(.caption)
-            }
-            Text(mediaType.rawValue)
+        HStack(spacing: 18) {
+                RoundedRectangle(cornerRadius: 8).frame(width: 60, height: 60)
+                VStack {
+                    Text(title)
+                    Text(mediaType.rawValue).font(.caption)
+                    if (subtitle != nil) {
+                        Text(subtitle!).foregroundStyle(.gray).font(.caption)
+                    }
+                }
         }.padding()
 
     }

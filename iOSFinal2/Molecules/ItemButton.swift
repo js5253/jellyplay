@@ -13,7 +13,7 @@ struct ItemButton: View {
         }
         .frame(width: 100.0, height: 100.0)
         .background(
-            Gradient(colors: [.teal, .cyan, .green]).opacity(
+            Gradient(colors: [.teal, .cyan]).opacity(
                 0.6
             )
         ).cornerRadius(2.5)

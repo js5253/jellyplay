@@ -11,7 +11,6 @@ enum AppErrors: Error {
     case invalid
     case notAuthenticatedError
 }
-
 final class JellyfinService: ObservableObject {
     static var shared = JellyfinService()
     
@@ -118,7 +117,7 @@ final class JellyfinService: ObservableObject {
                 throw AppErrors.notAuthenticatedError
             }
             if let textContent = String(data: data, encoding: .utf8) { // for debugging use
-                print(textContent)
+//                print(textContent)
             }
 
             let decoded = try JSONDecoder().decode(JellyfinMediaItem.self, from: data)

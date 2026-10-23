@@ -34,19 +34,17 @@ struct NowPlayingPage: View {
                     }
                 }
                 .task {
-                    // Use the task modifier to defer creating the player to ensure
-                    // SwiftUI creates it only once when it first presents the view.
                     do {
                         let url = try await JellyfinService.shared.getPlaybackUrl(itemId: item.id)// URL to local or remote media.
                         print(url)
                         player = AVPlayer(url: url)
                         player?.addPeriodicTimeObserver(forInterval: .init(seconds: 5.0, preferredTimescale: 1), queue: .global(), using: {time in
                             print("Reporting Item Progress: \(time)")
-                            // do something here
+                            
                         })
 
                     } catch {
-                        print("ERROR ;-;")
+                        ErrorService.shared.handleError(description: error, fatal: true)
                     }
                 }
             }
@@ -57,5 +55,5 @@ struct NowPlayingPage: View {
     }
 }
 #Preview {
-    NowPlayingPage(item: MediaItem(name: "Madoka Magica", itemType: .Series, id: "SASASASA"))
+    NowPlayingPage(item: MediaItem(name: "Madoka Magica", itemType: .Video, id: "SASASASA"))
 }

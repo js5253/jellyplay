@@ -39,6 +39,7 @@ struct SeasonViewer: View {
                     Task {
                         do {
                             if let seasonId = newVal {
+                                print(seasonId)
                                 episodes = try await JellyfinService.shared.getEpisodes(showId: item.id, seasonId: seasonId)
                             }
                         } catch {
@@ -47,16 +48,16 @@ struct SeasonViewer: View {
                     }
                 })
             }
-        }
-        .onAppear {
-            Task {
+        }.task {
                 do {
                     seasons = try await JellyfinService.shared.getSeasons(id: item.id)
                     selectedSeason = seasons?.first?.id
+                    
+                    episodes = try await JellyfinService.shared.getEpisodes(showId: item.id, seasonId: selectedSeason!)
+
                 } catch {
                     ErrorService.shared.handleError(description: error)
                 }
-            }
         }
     }
 }
